@@ -1,12 +1,17 @@
-import os
-import random
+import os, random, time
 from collections import defaultdict
 from Graph import Graph
+from Chronometer import timeit
 
 class RandomGraphGenerator(object):
+    
+    def __init__(self, seed=None):
+        if seed is not None:
+            random.seed(seed)
+        else:
+            random.seed('8has&Has%5sa654')
 
-    @staticmethod
-    def random_regular_graph(d, n, seed=None):
+    def random_regular_graph(self, d, n, seed=None):
         """Returns a random `d`-regular graph on `n` nodes.
     
         The resulting graph has no self-loops or parallel edges.
@@ -49,16 +54,13 @@ class RandomGraphGenerator(object):
         """
         if (n * d) % 2 != 0:
             raise Warning("n * d must be even")
-    
+
         if not 0 <= d < n:
             raise Warning("the 0 <= d < n inequality must be satisfied")
-    
+
         if d == 0:
             return
-    
-        if seed is not None:
-            random.seed(seed)
-    
+
         def _suitable(edges, potential_edges):
         # Helper subroutine to check if there are suitable edges remaining
         # If False, the generation of the graph has failed
@@ -106,7 +108,7 @@ class RandomGraphGenerator(object):
                 stubs = [node for node, potential in potential_edges.items()
                          for _ in range(potential)]
             return edges
-    
+
         # Even though a suitable edge set exists,
         # the generation of such a set is not guaranteed.
         # Try repeatedly to find one.
@@ -115,8 +117,8 @@ class RandomGraphGenerator(object):
             edges = _try_creation()
         return edges
 
-    @staticmethod
-    def convertSetToDict(set):
+    @timeit
+    def convertSetToDict(self, set):
         temp = {}
         for i in range(len(set)):
             v1, v2, cost = set.pop()
