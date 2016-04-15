@@ -19,10 +19,8 @@ def main(argv):
 	for p in arestas:
 		graphs_list = FileReader.readFile(p)
 
-	print (graphs_list)
-
 	set_of_edges = RandomGraphGenerator.random_regular_graph(4, 10)
-	print RandomGraphGenerator.convertSetToDict(set_of_edges)
+	print (RandomGraphGenerator.convertSetToDict(set_of_edges))
 
 	graph = Graph({'hospitalA': [1, 1, 3]})
 	graph.addEdge('hospitalB')
