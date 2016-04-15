@@ -1,0 +1,5 @@
+Como o software é em python, basta você rodar o seguinte comando python __init__.py
+
+Para você extender a biblioteca é simples também basta você escrever nos seus imports
+
+from src import *
