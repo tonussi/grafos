@@ -1,4 +1,4 @@
-import os
+import os, sys
 from blinker._utilities import text
 
 class FileReader(object):
@@ -22,7 +22,7 @@ class FileReader(object):
         return results
 
     @staticmethod
-    def writef(fileName='dat/graph.dat'):
+    def writef(fileName='results' + os.path.sep + 'results.dat', results=''):
         try:
             file = open(fileName, 'w')
         except IOError:
