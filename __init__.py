@@ -32,20 +32,20 @@ def main(argv):
 	graphs_directory = 'dat'
 	graphs_list = []
 
-	arestas = FileReader.listGraphsInDirectory(graphs_directory)
-
-	for p in arestas:
-		graphs_list.append(FileReader.readFile(p))
-	
-	for g in graphs_list:
-		print g
-
 	graph_generator = RandomGraphGenerator()
 
 	for i in [10, 20, 25, 50, 100, 500]:
 		set_of_edges = graph_generator.random_regular_graph(2, i)
 		dict_of_edges = graph_generator.convertSetToDict(set_of_edges)
-		FileReader.writef('results' + os.path.sep + 'results_' + str(i) + '_nodes' + '.dat', str(dict_of_edges))
+		FileReader.writef('dat' + os.path.sep + 'results_' + str(i) + '_nodes' + '.dat', 'listOFGraphs=' + str(dict_of_edges))
+
+	listOFGraphs = FileReader.listGraphsInDirectory(graphs_directory)
+
+	for p in listOFGraphs:
+		graphs_list.append(FileReader.readFile(p))
+	
+	for g in graphs_list:
+		print g
 
 	hospitalA = Hospital()
 	hospitalB = Hospital()
