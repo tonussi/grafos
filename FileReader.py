@@ -13,7 +13,7 @@ class FileReader(object):
         try:
             file = open(path)
             text = file.read()
-            exec text
+            exec (text)
             results = arestas
         except IOError:
             raise Exception('Excessao na hora da leitura')
@@ -22,7 +22,7 @@ class FileReader(object):
         return results
 
     @staticmethod
-    def writef(fileName, results):
+    def writef(fileName='dat/graph.dat'):
         try:
             file = open(fileName, 'w')
         except IOError:
