@@ -117,4 +117,8 @@ class RandomGraphGenerator(object):
 
     @staticmethod
     def convertSetToDict(set):
-        return dict([(elem, 0) for elem in set])
+        temp = {}
+        for i in range(len(set)):
+            v1, v2, cost = set.pop()
+            temp['v{}'.format(i)] = [v1, v2, cost]
+        return temp
