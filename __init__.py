@@ -1,5 +1,7 @@
+# encoding:utf-8
 from Graph import Graph
 from FileReader import FileReader
+from RandomGraphGenerator import RandomGraphGenerator
 import sys, getopt, os
 
 # v1 -> v2 custo
@@ -17,7 +19,10 @@ def main(argv):
 	for p in arestas:
 		graphs_list = FileReader.readFile(p)
 
-	print graphs_list
+	print (graphs_list)
+
+	set_of_edges = RandomGraphGenerator.random_regular_graph(4, 10)
+	print RandomGraphGenerator.convertSetToDict(set_of_edges)
 
 	graph = Graph({'hospitalA': [1, 1, 3]})
 	graph.addEdge('hospitalB')
