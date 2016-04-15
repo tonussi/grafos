@@ -11,6 +11,7 @@ class RandomGraphGenerator(object):
         else:
             random.seed('8has&Has%5sa654')
 
+    @timeit
     def random_regular_graph(self, d, n, seed=None):
         """Returns a random `d`-regular graph on `n` nodes.
     
