@@ -3,12 +3,20 @@ class Graph(object):
 	<p>This class implement a Graph
 	structure with basic funcions.</p>"""
 
-	def __init__(self, arg):
+	def __init__(self, arg={}, name=''):
 		super(Graph, self).__init__()
 		self.graph = arg
+		self.name = name
+
+	def name(self, name):
+		self.name = name
 
 	def addEdge(self, v):
 		self.graph[v] = []
+	
+	def addEdges(self, edges):
+		for e in edges:
+			self.graph[e]
 
 	def removeEdge(self, v):
 		if v in self.graph: 
