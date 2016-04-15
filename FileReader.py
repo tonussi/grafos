@@ -22,7 +22,7 @@ class FileReader(object):
         return results
 
     @staticmethod
-    def writef(fileName='results' + os.path.sep + 'results.dat', results=''):
+    def writef(fileName='dat' + os.path.sep + 'result.dat', results=''):
         try:
             file = open(fileName, 'w')
         except IOError:
