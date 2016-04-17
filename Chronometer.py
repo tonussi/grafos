@@ -1,5 +1,4 @@
 import time
-from time import sleep
 
 def timeit(method):
     """To use this functionality you have to put
@@ -12,4 +11,3 @@ def timeit(method):
         print('%r - %2.10f sec' % (method.__name__, te - ts))
         return result
     return timed
-        
