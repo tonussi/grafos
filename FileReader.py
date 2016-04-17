@@ -9,17 +9,19 @@ class FileReader(object):
 
     @staticmethod
     def readFile(path):
-        results = dict()
+        """
+        <code>with</code> is recommended to open files
+        this method open a file to get a edges-dict inside it
+        """
+        edges = {}
         try:
-            file = open(path)
-            text = file.read()
-            exec (text)
-            results = arestas
+            with open(path, 'r') as inf:
+                edges = eval(inf.read())
         except IOError:
-            raise Exception('Excessao na hora da leitura')
+            raise Exception("it was impossible to open the given file")
             sys.exit()
-        file.close()
-        return results
+        inf.close()
+        return edges
 
     @staticmethod
     def writef(fileName='dat' + os.path.sep + 'result.dat', results=''):
