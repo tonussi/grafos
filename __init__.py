@@ -13,24 +13,19 @@ import threading
 import random
 
 """
-You can choose -e or --export to build the dat directory
-this will populate the dat directory with graphs
-You also can start the calculation of a graph at time
-just input in your terminal the following line:
-python __init__.py -i dat/<name_of_file>
-and them fo to the /results directory at the root of this
-software package to pick up your results.
-note: this program already build regular graphs with random
-costs, and this program also makes use of an good algorithm to
-to build random regular graphs, see RandomGraphGenerator.py for
-more information. Another thing to account is that the program
-divide the efforts to find the best path into to running threads.
-each thread called Samu Slave will calculate the best path for the
-ambulance to arrive at his Medical Center. What I mean is that a
-ambulance A is related to medical center A and not to medical center B
-wich is related to ambulance B.\n"
+You can choose -e or --export to build the dat directory this will populate the
+dat directory with graphs You also can start the calculation of a graph at time
+just input in your terminal the following line: python __init__.py -i
+\"dat/<name_of_file>\" and them fo to the \"results\" directory at the root of
+this software package to pick up your results. note: this program already build
+regular graphs with random costs, and this program also makes use of an good
+algorithm to to build random regular graphs, see RandomGraphGenerator.py for
+more information. Another thing to account is that the program divide the
+efforts to find the best path into to running threads. each thread called Samu
+Slave will calculate the best path for the ambulance to arrive at his Medical
+Center. What I mean is that a ambulance A is related to medical center A and not
+to medical center B wich is related to ambulance B."
 """
-
 
 class SamuSlave(threading.Thread):
 
