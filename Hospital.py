@@ -1,7 +1,7 @@
 from FloydWarshall import FloydWarshall
 from Graph import Graph
 
-class Hospital(Graph, FloydWarshall):
+class Hospital(Graph):
     """<h1>Simple Graph Class Impl of the Medical Center's problem</h1>
     <p>This class implement a Graph for the Medical Center's problem
     Its structured with basic functions and extends FloydWarshall actions.</p>"""
