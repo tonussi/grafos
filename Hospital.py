@@ -17,6 +17,6 @@ class Hospital(Graph, FloydWarshall):
 
     def location(self, name):
         pass
-    
+
     def rotas(self):
         return self.rotas
