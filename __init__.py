@@ -116,8 +116,9 @@ def main(argv):
             print("(3) python __init__.py -h (help)")
             sys.exit()
         elif opt in ("-i", "--ifile"):
-            if os.path.exists(arg):
-                edges = FileReader.readFile(arg)
+            print(args)
+            if os.path.exists(args[0]):
+                edges = FileReader.readFile(args[0])
                 print(edges)
         elif opt in ("-e", "--export"):
             if not os.path.exists('dat'):
