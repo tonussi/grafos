@@ -44,14 +44,27 @@ class FloydWarshall:
                     distances[i][i] = 0
                     routes[i][j] = -1
 
-        for k in range(1, edges_size):
-            for i in range(1, edges_size):
+        for k in range(edges_size):
+            for i in range(edges_size):
+                # dont pick the vertex to itself
                 if i is not k:
-                    for j in range(1, edges_size):
+                    for j in range(edges_size):
+                        # dont pick the vertex to itself
                         if j is not k:
                             # d(i,j) = min{d(i, k), d(i,j) + d(j,k)}
                             distances[i][j] = min(distances[i][j], distances[i][k] + distances[k][j])
+                            # distances(i,j) reference before if doesnt apply to this testing
+                            # because its another position in the dictionary
                             if distances[i][j] > distances[i][k] + distances[k][j]:
+                                # k is the number of the node if the graph has 20 nodes
+                                # them k will from 0 to 19 to test all these node against
+                                # pairs of other nodes in the matrix of distances them
+                                # the algorithm just set 'k' (a certain node) to the route
+                                # that correspond to the distance, both matrixes represent
+                                # the same graph, thats because the algorithm can reference
+                                # routes here without any problem indexing problem
                                 routes[i][j] = k
 
+        # output 1: an nxn matrix [d = (i,j)] is the shortest distance from i to j under [c = (i,j)]
+        # output 2: an nxn matrix [e = (i,j)] is a node in the path from i to j
         return distances, routes
