@@ -42,7 +42,7 @@ class SamuSlave(threading.Thread):
     def run(self):
         threadLock.acquire()
         print('reconstruction path, threading number {} working....'.format(self.threadID))
-        self.hospital.findBestRoute()
+        self.hospital.buildMatrixDistancesAndMAtrixRoutes()
         threadLock.release()
 
 def exportNewRegularGraphsToDat(edgesArray=[10, 20, 50, 100, 500]):
