@@ -16,7 +16,7 @@ import random
 """
 You can choose -e or --export to build the dat directory this will populate the
 dat directory with graphs You also can start the calculation of a graph at time
-just input in your terminal the following line: python __init__.py -i
+just input in your terminal the following line: python app.py -i
 "dat/<name_of_file>" and them fo to the \"results\" directory at the root of
 this software package to pick up your results. note: this program already build
 regular graphs with random costs, and this program also makes use of an good
@@ -91,9 +91,9 @@ def start_samu_threadings(edges_list, threads_number, accident_location):
     return list_of_ambulances
 
 def command_help_text():
-    print("(1) python __init__.py -i <DAT_FILE_INPUT> (find best path)")
-    print("(2) python __init__.py -e (export)")
-    print("(3) python __init__.py -h (help)") 
+    print("(1) python app.py -i <DAT_FILE_INPUT> (find best path)")
+    print("(2) python app.py -e (export)")
+    print("(3) python app.py -h (help)") 
 
 def main(argv):
     try:
@@ -115,7 +115,7 @@ def main(argv):
             print (opt, args)
             if len(args) != 3 and args[0] is not 'dat':
                 raise Exception("must be 2 values to find a specific edge you need to type\n\
-python __init__.py -a (or --route-accident) <dir> <number> <number> where\n\
+python app.py -a (or --route-accident) <dir> <number> <number> where\n\
 <dir> is the name of the directory where there are files with the graphs\n\
 data <number> are valid vertex that exist in the files all files must be\n\
 of equal node numbers but can have distinct costs for each edge\n")
