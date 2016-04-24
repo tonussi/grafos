@@ -1,12 +1,24 @@
-Como o software é em python, basta você rodar o seguinte comando python __init__.py
+# Como utilizar o software
 
-Para você extender a biblioteca é simples também basta você escrever nos seus imports
+`python app.py -a <v1> <v2>`
 
-from src import *
+Assim você estará chamando a aplicação e enviando dois valores que representam os
+nós de onde a emergência se encontra. Mas entenda que a emergência se encontra entre
+os dois nós. O arco (aresta) que liga os dois nós é o local da emergência. Foi assim
+que fizemos, pois em um exemplo real acidente podem acontecer no percurso entre vértices.
+
+Depois que você rodar o comando acima no seu terminal. A aplicação deverá exportar as saídas
+dentro do diretório 'results' na raíz desse pacote de software.
 
 # RandomGraphGenerator
 
 A função para gerar grafos regulares aleatórios é baseada nos artigos:
+
+Não é necessário, porém você poderá gerar grafos regulares com a chamada
+
+`python app.py -e`
+
+Então vá até o diretório 'dat' e encontre as gerações lá.
 
         .. [1] A. Steger and N. Wormald,
            Generating random regular graphs quickly,
