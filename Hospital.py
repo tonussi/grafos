@@ -14,6 +14,7 @@ class Hospital(Graph):
         self.localization = localization
         self.routes = {}
         self.distances = {}
+        self.path = []
 
     def name(self, name):
         self.name = name
@@ -36,12 +37,16 @@ class Hospital(Graph):
                 strroutes += " {:4} ".format(self.routes[i][j])
             strdist += '\n'
             strroutes += '\n'
+        strpath = '\n'
+        for p in self.path:
+            strpath += " {:4} ".format(p)
         return 'Proximity Map: {:4}\n\
 Distances Matrix: {}\n\
 Routes Matrix: {}\n\
+Path: {}\n\
 Hospital Name: {}\n\
 Where is the emergency at? {}\n\
-Where the Hospital is located at? {}\n'.format(strgraph, strdist, strroutes, self.name, self.emergency, self.localization) + '\n'
+Where the Hospital is located at? {}\n'.format(strgraph, strdist, strroutes, strpath, self.name, self.emergency, self.localization) + '\n'
 
     def getRoute(self):
         return 'Best route I could find is: {}'.format(self.routes)
@@ -54,8 +59,7 @@ Where the Hospital is located at? {}\n'.format(strgraph, strdist, strroutes, sel
     def pathInBetween(self, u, v):
         if self.routes[u][v] is None:
             return []
-        path = [u]
+        self.path = [u]
         while u is not v:
             u = self.routes[u][v]
-            path.append(u)
-        return path
+            self.path.append(u)
