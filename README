@@ -10,6 +10,13 @@ que fizemos, pois em um exemplo real acidente podem acontecer no percurso entre 
 Depois que você rodar o comando acima no seu terminal. A aplicação deverá exportar as saídas
 dentro do diretório 'results' na raíz desse pacote de software.
 
+# Graph
+
+Para a classe Graph exist a GraphTest que testa e valida as ações básicas e
+derivadas. Para verificar isso basta no seu terminal você digitar:
+
+`python -m unittest discover -s ./ -p "*Test.py"`
+
 # RandomGraphGenerator
 
 A função para gerar grafos regulares aleatórios é baseada nos artigos:
