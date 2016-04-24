@@ -1,6 +1,10 @@
 # Como utilizar o software
 
-`python app.py -a <v1> <v2>`
+`python app.py -a <dir> <v1> <v2>`
+
+Nesse caso <dir> = 'dat' então um exemplo de entrada seria:
+
+`python app.py -a dat 3 5`
 
 Assim você estará chamando a aplicação e enviando dois valores que representam os
 nós de onde a emergência se encontra. Mas entenda que a emergência se encontra entre
