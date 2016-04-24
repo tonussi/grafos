@@ -48,8 +48,7 @@ Where the Hospital is located at? {}\n'.format(strgraph, strdist, strroutes, sel
 
     def buildMatrixDistancesAndMAtrixRoutes(self):
         floyd_warshall = FloydWarshall()
-        self.distances, self.routes = floyd_warshall.pathReconstruction(
-            self.graph)
+        self.distances, self.routes = floyd_warshall.pathReconstruction(self.graph)
         del floyd_warshall
 
     def pathInBetween(self, u, v):
