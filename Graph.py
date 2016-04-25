@@ -9,12 +9,9 @@ class Vertex(object):
 
     def __init__(self, vertexid):
         self.vertexid = vertexid
-        self.sucessor = None
-        self.predecessor = None
         self.name = 'vertex_object_' + str(time.clock())
-
         # this gives better control of the graph
-        self.adjacencies = set()
+        self.adjacencies = {}
 
     # add a name to the vertex (the name is like a property)
     def nameit(self, name):
@@ -22,12 +19,14 @@ class Vertex(object):
 
     # add a property to the vertex and give it a value
     def addAdjacency(self, vertexid):
-        self.adjacencies.add(vertexid)
+        if vertexid in self.adjacencies:
+            self.adjacencies[vertexid] = vertexid
 
     # remove an adjacency of this vertex but do not raise KeyError
     # is the element does not exists in the adjacencies set
     def removeAdjacency(self, vertexid):
-        self.adjacencies.discard(vertexid)
+        if vertexid in self.adjacencies:
+            del self.adjacencies[vertexid]
 
 class Graph(object):
     """
@@ -52,6 +51,10 @@ class Graph(object):
     def nameit(self, name):
         self.name = name
 
+    """
+    Basic actions
+    """
+
     # adds a new vertex (which is a node) to the graph dictionary
     @timeit
     def addVertex(self, vertexid):
@@ -71,17 +74,15 @@ class Graph(object):
     # removes a specific vertex (which is a node)  to the graph dictionary
     # it also removes all its conections
     @timeit
-    def removeVertex(self, v):
-        if v is not None:
-            del self.graph[v]
+    def removeVertex(self, vertexid):
+        # Python dict doesnt not consider None as being of type EmptySet element
+        if vertexid in self.graph:
+            for adjacency in self.getVertex(vertexid).adjacencies:
+                self.getVertex(adjacency).removeAdjacency(vertexid)
+            del self.graph[vertexid]
+            self.size = self.size - 1
         else:
             raise GraphValidationError('Vertex could not be of NoneType')
-
-    # remove a edge by id including all its conections
-    @timeit
-    def removeEdge(self, v):
-        if v in self.graph:
-            del self.graph[v]
 
     # connect node v1 to node v2
     # v1 and v2 must exist in order to connect
@@ -91,40 +92,107 @@ class Graph(object):
     @timeit
     def connect(self, vertexid1, vertexid2):
         if vertexid1 in self.graph and vertexid2 in self.graph:
-            self.graph.get(vertexid1).sucessor = Vertex(vertexid2)
-            self.graph.get(vertexid1).addAdjacency(vertexid2)
-            self.graph.get(vertexid2).predecessor = Vertex(vertexid1)
-            self.graph.get(vertexid1).addAdjacency(vertexid1)
+            self.graph.get(vertexid1).adjacencies[vertexid2] = vertexid2
+            self.graph.get(vertexid2).adjacencies[vertexid1] = vertexid1
         else:
             raise GraphValidationError('Verify if vertexid1 and vertexid2 exists before try to made a connection')
 
     @timeit
     def disconnect(self, vertexid1, vertexid2):
         if vertexid1 in self.graph and vertexid2 in self.graph:
-            del self.graph[vertexid1].sucessor
-            del self.graph[vertexid2].predecessor
+            # when removing adjacency of v2 onto v1, its also
+            # needed to be removed a existing adjancency of v1
+            # onto v2 the same logic apply to the connection
+            self.graph[vertexid1].removeAdjacency(vertexid2)
+            self.graph[vertexid2].removeAdjacency(vertexid1)
         else:
             raise GraphValidationError('Verify if vertexid1 and vertexid2 exists before try to made a connection')
 
     # return the number of nodes that are present in the graph
-    def magnitude(self):
+    def graphMagnitude(self):
         return len(self.graph)
 
     @timeit
-    def vertexes(self):
-        res = set()
-        for node in self.graph:
-            res.add(node)
-        return res
+    def graphVertexes(self):
+        return self.graph.keys()
 
     @timeit
     def getVertex(self, vertexid):
-        return self.graph.get(vertexid)
+        if vertexid in self.graph:
+            return self.graph.get(vertexid)
+        else:
+            return None
 
-    # timeit
-    def getAdjacencies(self, vertexid):
+    @timeit
+    def vertexAdjacencies(self, vertexid):
+        """
+        This method is really useful on this point of view
+        the Graph klazz has control of his vertexes's adjacencies
+        Of couse this method could be in the Vertex klazz, it doesnt
+        really matters. This method returns the adjacency set of a
+        vertex. The method get the vertex in O(1) time, because Graph
+        use self.graph = {} (a dictionary). In other words this klazz
+        make use of the properties of dictionary hashing mechanisms.
+        """
         if vertexid in self.graph:
             return self.getVertex(vertexid).adjacencies
         else:
             raise GraphValidationError('Verify if vertexid1 exists before to get its adjacencies')
 
+    @timeit
+    def vertexMagnitude(self, vertexid):
+        if vertexid in self.graph:
+            return len(self.getVertex(vertexid).adjacencies)
+        else:
+            raise GraphValidationError('Verify if vertexid1 exists before to get its adjacencies')
+
+    """
+    Derivated actions
+    """
+
+    def isRegular(self):
+        node = list(self.graph.values())[0]
+        test = len(node.adjacencies)
+        for vertexid in self.graph:
+            if (test != self.vertexMagnitude(vertexid)):
+                return False
+        return True
+
+    def isComplete(self):
+        n = self.size - 1
+        for vertexid in self.graph:
+            if (n != self.vertexMagnitude(vertexid)):
+                return False
+        return True
+
+    def transitiveClosure(self, vertexid):
+        return self.__findTransitiveClosure(vertexid=vertexid, visited=list())
+
+    def __findTransitiveClosure(self, vertexid, visited):
+        ft = []
+        visited.append(vertexid)
+        for adjacency in self.vertexAdjacencies(vertexid):
+            if not adjacency in visited:
+                ft = ft.append(self.__findTransitiveClosure(vertexid=adjacency, visited=visited))
+        return ft
+
+    def isRelational(self):
+        for vertex in self.graph.keys():
+            if vertex not in self.transitiveClosure(vertex):
+                return False
+        return True
+
+    def isTree(self):
+        node = list(self.graph.values())[0]
+        return self.isRelational() and not self.__haveCycleWith(node.vertexid, node.vertexid, [])
+
+    def __haveCycleWith(self, sucessor, predecessor, visited):
+        if sucessor in visited:
+            return True
+        visited.add(sucessor)
+        for adjacency in self.vertexAdjacencies(sucessor):
+            if adjacency is not predecessor:
+                if self.__haveCycleWith(adjacency, sucessor, visited):
+                    return True
+        visited.discard(sucessor)
+        return False
