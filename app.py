@@ -1,17 +1,14 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from Graph import Graph
 from FileReader import FileReader
 from Hospital import Hospital
 from RandomGraphGenerator import RandomGraphGenerator
-from FloydWarshall import FloydWarshall
 
 import sys
 import getopt
 import os
 import threading
-import random
 
 """
 You can choose -e or --export to build the dat directory this will populate the
@@ -43,7 +40,12 @@ class SamuSlave(threading.Thread):
     def run(self):
         threadLock.acquire()
         print('reconstruction path, threading number {} working....'.format(self.threadID))
-        self.hospital.buildMatrixDistancesAndMAtrixRoutes()
+        try:
+            self.hospital.buildMatrixDistancesAndMAtrixRoutes()
+            self.hospital.pathInBetween()
+        except KeyError:
+            threadLock.release()
+            raise Exception('Thread name: {}, id: {} found KeyError maybe in a certain graph dictionary'.format(self.name, self.threadID))
         threadLock.release()
 
 def exportNewRegularGraphsToDat(edgesArray=[10, 20, 50, 100, 500]):
