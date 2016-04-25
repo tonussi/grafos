@@ -22,13 +22,9 @@ class Hospital(Graph):
     def __str__(self):
         strgraph = '\n'
         for i in range(len(self.graph) - 1):
-            strgraph += 'edge {:2}: {:2} -> {:2}: {:2} (miles)\n'.format(
-                i,
-                self.graph[i][0],
-                self.graph[i][1],
-                self.graph[i][2])
-        strgraph += 'edge {:2}: {:2} -> {:2}: {:2} (hospital location)\n'.format(
-            len(self.graph), self.graph[-1][0], self.graph[-1][1], self.graph[-1][2])
+            strgraph += 'edge {:2}: {:2} -> {:2}: {:2} (miles)\n'.format(i, self.graph[i][0], self.graph[i][1], self.graph[i][2])
+        strgraph += 'edge {:2}: {:2} -> {:2}: {:2} (hospital location)\n'.format(len(self.graph), self.graph[-1][0], self.graph[-1][1], self.graph[-1][2])
+
         strdist = '\n'
         strroutes = '\n'
         for i in range(len(self.distances)):
@@ -56,10 +52,29 @@ Where the Hospital is located at? {}\n'.format(strgraph, strdist, strroutes, str
         self.distances, self.routes = floyd_warshall.pathReconstruction(self.graph)
         del floyd_warshall
 
-    def pathInBetween(self, u, v):
-        if self.routes[u][v] is None:
-            return []
-        self.path = [u]
-        while u is not v:
-            u = self.routes[u][v]
-            self.path.append(u)
+    def pathInBetween(self):
+        """
+        @todo: this method needs to be implemented
+        basically the algorithm is the following:
+
+        The usage is basically when invoking this
+        function the caller wants to find the path
+        with the costs related between A and B.
+        
+        If B is direct related to A them the Algorithm should run O(1)
+        If the path between B and A is n arcs (or edges) them the algorithm runs O(n^2)
+        where n is the number of arcs, because the worst case scenario the function will
+        run through all the distances matrix and routes matrix to gather all the path and costs.
+
+        <code>
+        Algorithm PathInBetween(nodeA, nodeB):
+            if self.routes[nodeA][nodeB] is None:
+                return []
+            self.path = [u]
+            while u is not v
+                u = self.routes[u][v]
+                self.path.append(u)
+            return path
+        </code>
+        """
+        pass
