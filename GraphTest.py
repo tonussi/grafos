@@ -49,10 +49,10 @@ class GraphTest(unittest.TestCase):
                          'size must be equal to length(self.graph.graph)')
 
     def testShouldConnectUsingNumbers(self):
-        self.graph.addVertex(1)
-        self.graph.addVertex(2)
+        self.graph.addVertex(vertexid=1)
+        self.graph.addVertex(vertexid=2)
         self.graph.connect(vertexid1=1, vertexid2=2)
-        self.assertTrue(2 in self.graph.vertexAdjacencies(1),
+        self.assertTrue(2 in self.graph.vertexAdjacencies(vertexid=1),
                          'after insertion and connection 2 must be \"sucessor\" of 1')
 
     def testAddVertexObjectInsteadOfId(self):
@@ -84,7 +84,7 @@ class GraphTest(unittest.TestCase):
 
     def testGraphMagnitude(self):
         self.assertFalse(self.graph.graphMagnitude() == 7,
-                          'should have take the number of nodes already inserted in')
+                         'should have take the number of nodes already inserted in')
         self.graph.disconnect(vertexid1='v1', vertexid2='v5')
         self.assertEquals(self.graph.graphMagnitude(), 5,
                           'should have take the number of nodes already inserted in')
@@ -110,11 +110,63 @@ class GraphTest(unittest.TestCase):
         self.graph.connect(vertexid1='v4', vertexid2='v5')
         self.assertEquals(self.graph.isRegular(), True, 'should return false a first attempt')
 
-    def testFindTransitiveClosure(self):
+    def testIfItIsCompleteGraph(self):
         self.graph.connect(vertexid1='v3', vertexid2='v4')
         self.graph.connect(vertexid1='v3', vertexid2='v5')
         self.graph.connect(vertexid1='v4', vertexid2='v5')
-        print(self.graph.transitiveClosure(vertexid='v3'))
+        self.assertEquals(self.graph.isComplete(), True, 'should return false a first attempt')
+
+    def testIfItIsCompleteGraphAfterAnotherConnection(self):
+        self.graph.connect(vertexid1='v3', vertexid2='v4')
+        self.graph.connect(vertexid1='v3', vertexid2='v5')
+        self.graph.connect(vertexid1='v4', vertexid2='v5')
+        self.graph.connect(vertexid1='v4', vertexid2='v4')
+        self.assertEquals(self.graph.isComplete(), False,
+                          'this really should fail because we just added an adjacency to v4 itself')
+
+    def testFindTransitiveClosure(self):
+        newGraph = Graph()
+        newGraph.addVertex(1)
+        newGraph.addVertex(2)
+        newGraph.connect(vertexid1=1, vertexid2=2)
+        testTransitiveClosureSet = newGraph.transitiveClosure(vertexid=1)
+        self.assertTrue(1 in testTransitiveClosureSet and
+                        2 in testTransitiveClosureSet,
+                        'should be inside the transitive closure')
+        del newGraph
+
+    def testIfItIsRelational(self):
+        self.assertTrue(self.graph.isRelational(), 'this graph in this state should not be relational because\
+v4 and v5 dont have connection in between')
+
+        # diconnect some vertexes and try the test again
+        self.graph.disconnect(vertexid1='v1', vertexid2='v2')
+        self.graph.disconnect(vertexid1='v1', vertexid2='v3')
+        self.graph.disconnect(vertexid1='v2', vertexid2='v2')
+        self.graph.disconnect(vertexid1='v2', vertexid2='v3')
+        self.assertFalse(self.graph.isRelational(), 'should not be relational')
+
+    def testIfItIsTree(self):
+        self.assertFalse(self.graph.isTree(), 'should not be a tree')
+
+        # (1)  (2)  (3)
+        #    \  |  /
+        #     \ | /
+        #      (4)
+        #       |
+        #      (5)
+        newGraph = Graph()
+        newGraph.addVertex(1)
+        newGraph.addVertex(2)
+        newGraph.addVertex(3)
+        newGraph.addVertex(4)
+        newGraph.addVertex(5)
+        newGraph.connect(vertexid1=1, vertexid2=4)
+        newGraph.connect(vertexid1=2, vertexid2=4)
+        newGraph.connect(vertexid1=3, vertexid2=4)
+        newGraph.connect(vertexid1=5, vertexid2=4)
+        self.assertTrue(newGraph.isTree(), 'should be a tulip right, its a flower sort of...')
+        del newGraph
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
