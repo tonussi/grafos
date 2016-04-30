@@ -1,7 +1,6 @@
 from Chronometer import timeit
 
-INFINITE = -99999
-
+INFINITE = 99999
 
 class FloydWarshall:
     '''
@@ -11,32 +10,35 @@ class FloydWarshall:
     '''
 
     @timeit
-    def pathReconstruction(self, edges):
-        edges_size = len(edges)
+    def pathReconstruction(self, graph):
+        graph_size = graph.graphMagnitude()
 
         # instanciate distances dictionary
         distances = {}
         # instanciate routes dictionary
         routes = {}
 
-        # read edges multilist from 0 to the length of edges
-        for i in range(edges_size):
+        # read graph multilist from 0 to the length of graph
+        for i in graph.graph:
 
             # create indexes for the costs dictionary
             distances[i] = {}
             # create indexes for the routes dictionary
             routes[i] = {}
 
-            # start to read from 0 to length of edges
-            for j in range(edges_size):
+            # start to read from 0 to length of graph
+            for j in graph.graph:
                 if i != j:
                     # get only elements around main diagonal
                     # fill distances matrix with the costs
-                    distances[i][j] = edges[i][2]
-                    # paths that are unknown may be filled with INFINITE = -99999
+                    if graph.vertexAdjacencies(i).get(j) is not None:
+                        distances[i][j] = graph.vertexAdjacencies(i).get(j).getcost()
+                    else:
+                        distances[i][j] = INFINITE
+                    # paths that are unknown may be filled with INFINITE = 99999
                     # we known that floyd warshall also work with negative costs
                     # but for this graph example all costs may be positive
-                    routes[i][j] = edges[i][1]
+                    routes[i][j] = graph.getVertex(i).vertexid
                 else:
                     # for index (key, key) give it 0 cost in this model we
                     # are considering that a node to itself have zero cost
@@ -44,11 +46,11 @@ class FloydWarshall:
                     distances[i][i] = 0
                     routes[i][j] = -1
 
-        for k in range(edges_size):
-            for i in range(edges_size):
+        for k in range(graph_size):
+            for i in range(graph_size):
                 # dont pick the vertex to itself
                 if i is not k:
-                    for j in range(edges_size):
+                    for j in range(graph_size):
                         # dont pick the vertex to itself
                         if j is not k:
                             # d(i,j) = min{d(i, k), d(i,j) + d(j,k)}
