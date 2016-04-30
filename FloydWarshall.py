@@ -1,5 +1,3 @@
-from Chronometer import timeit
-
 INFINITE = 99999
 
 class FloydWarshall:
@@ -9,7 +7,6 @@ class FloydWarshall:
     represents a Graph
     '''
 
-    @timeit
     def pathReconstruction(self, graph):
         graph_size = graph.graphMagnitude()
 
