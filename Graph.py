@@ -1,9 +1,7 @@
-from Chronometer import timeit
 import time
 
 class GraphValidationError(Exception):
     pass
-
 
 class Vertex(object):
 
@@ -18,8 +16,17 @@ class Vertex(object):
         self.name = name
 
     # add a property to the vertex and give it a value
-    def addAdjacency(self, vertexid):
+    def addAdjacency(self, vertexid, cost):
+        # create a new adjacency but only if its not already there
+        if vertexid not in self.adjacencies:
+            # the key is the adjacency, and the value is the whatever cost it is
+            self.adjacencies[vertexid] = cost
+
+    def editAdjacency(self, vertexid, cost):
+        # inserts it only if its not already there
         if vertexid in self.adjacencies:
+            if cost != None:
+                self.adjacencies[vertexid] = (vertexid, cost)
             self.adjacencies[vertexid] = vertexid
 
     # remove an adjacency of this vertex but do not raise KeyError
@@ -27,6 +34,22 @@ class Vertex(object):
     def removeAdjacency(self, vertexid):
         if vertexid in self.adjacencies:
             del self.adjacencies[vertexid]
+
+class Weight(object):
+
+    def __init__(self, cost):
+        if cost != None:
+            self.cost = cost
+        else:
+            self.cost = 0
+        self.name = 'weigth_object_' + str(time.clock())
+
+    # add a name to the vertex (the name is like a property)
+    def nameit(self, name):
+        self.name = name
+
+    def getcost(self):
+        return self.cost
 
 class Graph(object):
     """
@@ -51,29 +74,51 @@ class Graph(object):
     def nameit(self, name):
         self.name = name
 
+    def __str__(self):
+        strgraph = '\n'
+        for vertexid in self.graph:
+            strgraph += 'vertex id:{:2}, is connected to: '.format(vertexid)
+            temp_adjacencies = self.vertexAdjacencies(vertexid=vertexid)
+            strgraph += 'adjacencies = ['
+            for key in temp_adjacencies:
+                strgraph += ' (adj:{:2}, cost:{:2}) '.format(key, temp_adjacencies.get(key).getcost())
+            strgraph += ']\n'
+        return '{}'.format(strgraph) + '\n'
+
+    """
+    This method above is useful to convert a list of lists
+    graph-like structure to fit inside this Graph klazz data
+    structure
+    
+    @param edges_map: List of lists graph like structure
+    with the elements being a list like this [v1, v2, cost]
+    """
+    @staticmethod
+    def newGraphFromEdgesMap(edges_map):
+        newGraph = Graph()
+        for edge in edges_map:
+                newGraph.addVertex(vertexid=edge[0])
+                newGraph.addVertex(vertexid=edge[1])
+                newGraph.connect(vertexid1=edge[0], vertexid2=edge[1], cost=edge[2])
+        return newGraph
+
     """
     Basic actions
     """
 
     # adds a new vertex (which is a node) to the graph dictionary
-    @timeit
     def addVertex(self, vertexid):
         if not vertexid in self.graph:
             if isinstance(vertexid, Vertex):
                 if not vertexid.vertexid in self.graph:
                     self.graph[vertexid] = vertexid
                     self.size = self.size + 1
-                else:
-                    raise GraphValidationError('This vertex already exists in the graph')
             else:
                 self.graph[vertexid] = Vertex(vertexid)
                 self.size = self.size + 1
-        else:
-            raise GraphValidationError('This vertex already exists in the graph')
 
     # removes a specific vertex (which is a node)  to the graph dictionary
     # it also removes all its conections
-    @timeit
     def removeVertex(self, vertexid):
         # Python dict doesnt not consider None as being of type EmptySet element
         if vertexid in self.graph:
@@ -89,15 +134,14 @@ class Graph(object):
     # the order matter here, what i mean is that
     # v1 will be predecessor of v2 and
     # v2 will be sucessor of v1
-    @timeit
-    def connect(self, vertexid1, vertexid2):
+    def connect(self, vertexid1, vertexid2, cost):
         if vertexid1 in self.graph and vertexid2 in self.graph:
-            self.graph.get(vertexid1).adjacencies[vertexid2] = vertexid2
-            self.graph.get(vertexid2).adjacencies[vertexid1] = vertexid1
+            self.getVertex(vertexid1).addAdjacency(vertexid2, Weight(cost))
+            self.getVertex(vertexid2).addAdjacency(vertexid1, Weight(cost))
+            return True
         else:
-            raise GraphValidationError('Verify if vertexid1 and vertexid2 exists before try to made a connection')
+            return False
 
-    @timeit
     def disconnect(self, vertexid1, vertexid2):
         if vertexid1 in self.graph and vertexid2 in self.graph:
             # when removing adjacency of v2 onto v1, its also
@@ -105,25 +149,23 @@ class Graph(object):
             # onto v2 the same logic apply to the connection
             self.graph[vertexid1].removeAdjacency(vertexid2)
             self.graph[vertexid2].removeAdjacency(vertexid1)
+            return True
         else:
-            raise GraphValidationError('Verify if vertexid1 and vertexid2 exists before try to made a connection')
+            return False
 
     # return the number of nodes that are present in the graph
     def graphMagnitude(self):
         return len(self.graph)
 
-    @timeit
     def graphVertexes(self):
         return self.graph.keys()
 
-    @timeit
     def getVertex(self, vertexid):
         if vertexid in self.graph:
             return self.graph.get(vertexid)
         else:
             return None
 
-    @timeit
     def vertexAdjacencies(self, vertexid):
         """
         This method is really useful on this point of view
@@ -136,15 +178,12 @@ class Graph(object):
         """
         if vertexid in self.graph:
             return self.getVertex(vertexid).adjacencies
-        else:
-            raise GraphValidationError('Verify if vertexid1 exists before to get its adjacencies')
 
-    @timeit
     def vertexMagnitude(self, vertexid):
         if vertexid in self.graph:
             return len(self.getVertex(vertexid).adjacencies)
         else:
-            raise GraphValidationError('Verify if vertexid1 exists before to get its adjacencies')
+            raise GraphValidationError('Verify if vertexid={} exists before to get its adjacencies'.format(vertexid))
 
     """
     Derivated actions
@@ -166,33 +205,62 @@ class Graph(object):
         return True
 
     def transitiveClosure(self, vertexid):
-        return self.__findTransitiveClosure(vertexid=vertexid, visited=list())
+        visited = set()
+        self.__findTransitiveClosure(vertexid, visited)
+        return visited
 
     def __findTransitiveClosure(self, vertexid, visited):
-        ft = []
-        visited.append(vertexid)
-        for adjacency in self.vertexAdjacencies(vertexid):
-            if not adjacency in visited:
-                ft = ft.append(self.__findTransitiveClosure(vertexid=adjacency, visited=visited))
-        return ft
+        visited.add(vertexid)
 
+        for adjacency in self.vertexAdjacencies(vertexid):
+            if adjacency not in visited:
+                self.__findTransitiveClosure(adjacency, visited)
+
+    """
+    [relational] means in portuguese: relacionado, relativo,
+    conexo, aparentado, ligado. Verify if exists at least one
+    way between every pair of nodes in the graph
+    """
     def isRelational(self):
-        for vertex in self.graph.keys():
-            if vertex not in self.transitiveClosure(vertex):
+        node = list(self.graph.values())[0]
+        for vertexid in self.graphVertexes():
+            if vertexid not in self.transitiveClosure(node.vertexid):
                 return False
         return True
 
+    """
+    Please have a look at https://en.wikipedia.org/wiki/Tree_(graph_theory)
+    """
     def isTree(self):
+        visited = set()
         node = list(self.graph.values())[0]
-        return self.isRelational() and not self.__haveCycleWith(node.vertexid, node.vertexid, [])
+        return self.isRelational() and not self.__haveCycleWith(node.vertexid, node.vertexid, visited)
 
     def __haveCycleWith(self, sucessor, predecessor, visited):
+        # base case scenario
         if sucessor in visited:
             return True
+
         visited.add(sucessor)
+
         for adjacency in self.vertexAdjacencies(sucessor):
             if adjacency is not predecessor:
                 if self.__haveCycleWith(adjacency, sucessor, visited):
                     return True
-        visited.discard(sucessor)
+
+        visited.remove(sucessor)
+
+        return False
+
+    def __removeCycle(self, sucessor, predecessor, visited):
+        if sucessor in visited:
+            self.disconnect(vertexid1=sucessor.vertexid, vertexid2=predecessor.vertexid)
+            return True
+
+        visited.add(sucessor)
+
+        for adjacency in self.vertexAdjacencies(sucessor):
+            if adjacency is not predecessor:
+                if self._removeCiclo(adjacency, sucessor, visited):
+                    return True
         return False

@@ -1,5 +1,5 @@
 import unittest
-from Graph import Graph, Vertex, GraphValidationError
+from Graph import Graph, Vertex
 
 class GraphTest(unittest.TestCase):
 
@@ -10,14 +10,14 @@ class GraphTest(unittest.TestCase):
         self.graph.addVertex(vertexid='v3')
         self.graph.addVertex(vertexid='v4')
         self.graph.addVertex(vertexid='v5')
-        self.graph.connect(vertexid1='v1', vertexid2='v2')
-        self.graph.connect(vertexid1='v1', vertexid2='v3')
-        self.graph.connect(vertexid1='v1', vertexid2='v4')
-        self.graph.connect(vertexid1='v1', vertexid2='v5')
-        self.graph.connect(vertexid1='v2', vertexid2='v1')
-        self.graph.connect(vertexid1='v2', vertexid2='v3')
-        self.graph.connect(vertexid1='v2', vertexid2='v4')
-        self.graph.connect(vertexid1='v2', vertexid2='v5')
+        self.graph.connect(vertexid1='v1', vertexid2='v2', cost=None)
+        self.graph.connect(vertexid1='v1', vertexid2='v3', cost=None)
+        self.graph.connect(vertexid1='v1', vertexid2='v4', cost=None)
+        self.graph.connect(vertexid1='v1', vertexid2='v5', cost=None)
+        self.graph.connect(vertexid1='v2', vertexid2='v1', cost=None)
+        self.graph.connect(vertexid1='v2', vertexid2='v3', cost=None)
+        self.graph.connect(vertexid1='v2', vertexid2='v4', cost=None)
+        self.graph.connect(vertexid1='v2', vertexid2='v5', cost=None)
         # for node in self.graph.graph:
         #    print('sucessor: {}\n'.format(self.graph.graph.get(node).sucessor),
         #          'predecessor: {}\n'.format(self.graph.graph.get(node).predecessor))
@@ -35,31 +35,30 @@ class GraphTest(unittest.TestCase):
                             self.graph.getVertex(vertexid='v2').vertexid,
                             'should have diferent ids')
 
-    def testAddSucessorPredecessorToVertex(self):
+    def testWeigth(self):
         self.graph.addVertex(vertexid='v6')
         self.graph.addVertex(vertexid='v7')
-        self.graph.connect('v6', 'v7')
-        self.assertEquals(self.graph.vertexAdjacencies('v6').get('v7'), 'v7',
-                          'v6 should have a sucessor pointing to v7')
-        self.assertEquals(self.graph.vertexAdjacencies('v7').get('v6'), 'v6',
-                          'v7 should have a predecessor pointing to v6')
+        self.graph.connect('v6', 'v7', cost=1290)
+        self.assertEquals(self.graph.vertexAdjacencies('v6').get('v7').getcost(), 1290,
+                          'v6 should have weigth equal to 1290 linked to v7')
+        self.assertEquals(self.graph.vertexAdjacencies('v7').get('v6').getcost(), 1290,
+                          'v7 should have weigth equal to 1290 linked to v6')
 
     def testSizeShouldBeEqualToGraphLength(self):
         self.assertEqual(self.graph.size, len(self.graph.graph),
                          'size must be equal to length(self.graph.graph)')
 
     def testShouldConnectUsingNumbers(self):
-        self.graph.addVertex(1)
-        self.graph.addVertex(2)
-        self.graph.connect(vertexid1=1, vertexid2=2)
-        self.assertTrue(2 in self.graph.vertexAdjacencies(1),
+        self.graph.addVertex(vertexid=1)
+        self.graph.addVertex(vertexid=2)
+        self.graph.connect(vertexid1=1, vertexid2=2, cost=None)
+        self.assertTrue(2 in self.graph.vertexAdjacencies(vertexid=1),
                          'after insertion and connection 2 must be \"sucessor\" of 1')
 
     def testAddVertexObjectInsteadOfId(self):
-        with self.assertRaises(GraphValidationError):
-            self.assertEqual(self.graph.addVertex(vertexid=Vertex('v1')),
-                             self.graph.getVertex('v1'),
-                             'should really get a raise for that')
+        #with self.assertRaises(GraphValidationError):
+        self.assertEqual(self.graph.addVertex(vertexid=Vertex('v1')),
+                         None, 'should get None after trying to input another \"v1\" in the graph')
 
     def testMakeDisconnectOfVertexes(self):
         self.graph.disconnect(vertexid1='v1', vertexid2='v5')
@@ -76,15 +75,15 @@ class GraphTest(unittest.TestCase):
                          'should return nothing because v1 was removed before this')
         self.assertFalse('v1' in self.graph.vertexAdjacencies('v4'),
                          'should return nothing because v1 was removed before this')
-        with self.assertRaises(GraphValidationError):
-            self.assertEquals(self.graph.vertexAdjacencies(vertexid='v1'), None,
-                              'should return nothign because it has been already deleted')
+        #with self.assertRaises(GraphValidationError):
+        self.assertEquals(self.graph.vertexAdjacencies(vertexid='v1'), None,
+                          'should return nothign because it has been already deleted')
         self.assertTrue(self.graph.size == len(self.graph.graph) == self.graph.graphMagnitude(),
                         'should return true for all ways to get the graph size')
 
     def testGraphMagnitude(self):
         self.assertFalse(self.graph.graphMagnitude() == 7,
-                          'should have take the number of nodes already inserted in')
+                         'should have take the number of nodes already inserted in')
         self.graph.disconnect(vertexid1='v1', vertexid2='v5')
         self.assertEquals(self.graph.graphMagnitude(), 5,
                           'should have take the number of nodes already inserted in')
@@ -105,16 +104,92 @@ class GraphTest(unittest.TestCase):
         useful connections.
         """
         self.assertEquals(self.graph.isRegular(), False, 'should return false a first attempt')
-        self.graph.connect(vertexid1='v3', vertexid2='v4')
-        self.graph.connect(vertexid1='v3', vertexid2='v5')
-        self.graph.connect(vertexid1='v4', vertexid2='v5')
+        self.graph.connect(vertexid1='v3', vertexid2='v4', cost=None)
+        self.graph.connect(vertexid1='v3', vertexid2='v5', cost=None)
+        self.graph.connect(vertexid1='v4', vertexid2='v5', cost=None)
         self.assertEquals(self.graph.isRegular(), True, 'should return false a first attempt')
 
+    def testIfItIsCompleteGraph(self):
+        self.graph.connect(vertexid1='v3', vertexid2='v4', cost=None)
+        self.graph.connect(vertexid1='v3', vertexid2='v5', cost=None)
+        self.graph.connect(vertexid1='v4', vertexid2='v5', cost=None)
+        self.assertEquals(self.graph.isComplete(), True, 'should return false a first attempt')
+
+    def testIfItIsCompleteGraphAfterAnotherConnection(self):
+        self.graph.connect(vertexid1='v3', vertexid2='v4', cost=None)
+        self.graph.connect(vertexid1='v3', vertexid2='v5', cost=None)
+        self.graph.connect(vertexid1='v4', vertexid2='v5', cost=None)
+        self.graph.connect(vertexid1='v4', vertexid2='v4', cost=None)
+        self.assertEquals(self.graph.isComplete(), False,
+                          'this really should fail because we just added an adjacency to v4 itself')
+
     def testFindTransitiveClosure(self):
-        self.graph.connect(vertexid1='v3', vertexid2='v4')
-        self.graph.connect(vertexid1='v3', vertexid2='v5')
-        self.graph.connect(vertexid1='v4', vertexid2='v5')
-        print(self.graph.transitiveClosure(vertexid='v3'))
+        newGraph = Graph()
+        newGraph.addVertex(1)
+        newGraph.addVertex(2)
+        newGraph.connect(vertexid1=1, vertexid2=2, cost=None)
+        testTransitiveClosureSet = newGraph.transitiveClosure(vertexid=1)
+        self.assertTrue(1 in testTransitiveClosureSet and
+                        2 in testTransitiveClosureSet,
+                        'should be inside the transitive closure')
+        del newGraph
+
+    def testIfItIsRelational(self):
+        self.assertTrue(self.graph.isRelational(), 'this graph in this state should not be relational because\
+v4 and v5 dont have connection in between')
+
+        # diconnect some vertexes and try the test again
+        self.graph.disconnect(vertexid1='v1', vertexid2='v2')
+        self.graph.disconnect(vertexid1='v1', vertexid2='v3')
+        self.graph.disconnect(vertexid1='v2', vertexid2='v2')
+        self.graph.disconnect(vertexid1='v2', vertexid2='v3')
+        self.assertFalse(self.graph.isRelational(), 'should not be relational')
+
+    def testIfItIsTree(self):
+        self.assertFalse(self.graph.isTree(), 'should not be a tree')
+
+        # (1)  (2)  (3)
+        #    \  |  /
+        #     \ | /
+        #      (4)
+        #       |
+        #      (5)
+        newGraph = Graph()
+        newGraph.addVertex(1)
+        newGraph.addVertex(2)
+        newGraph.addVertex(3)
+        newGraph.addVertex(4)
+        newGraph.addVertex(5)
+        newGraph.connect(vertexid1=1, vertexid2=4, cost=None)
+        newGraph.connect(vertexid1=2, vertexid2=4, cost=None)
+        newGraph.connect(vertexid1=3, vertexid2=4, cost=None)
+        newGraph.connect(vertexid1=5, vertexid2=4, cost=None)
+        self.assertTrue(newGraph.isTree(), 'should be a tulip right, its a flower sort of...')
+        del newGraph
+
+    def testConvertEdgesListToGraph(self):
+        edges_map = [[ 2 , 0 , 44 ],
+                     [ 2 , 1 , 57 ],
+                     [ 3 , 1 , 73 ],
+                     [ 3 , 2 , 56 ],
+                     [ 4 , 0 , 74 ],
+                     [ 4 , 1 , 51 ],
+                     [ 4 , 2 , 66 ],
+                     [ 4 , 3 , 71 ],
+                     [ 5 , 2 , 70 ],
+                     [ 5 , 4 , 62 ],
+                     [ 6 , 0 , 34 ],
+                     [ 6 , 1 , 74 ],
+                     [ 6 , 2 , 58 ],
+                     [ 6 , 3 , 80 ],
+                     [ 6 , 4 , 87 ],
+                     [ 6 , 5 , 76 ],
+                     [ 2,  4 , 0  ]]
+        newGraph = Graph.newGraphFromEdgesMap(edges_map)
+
+        for edge in edges_map:
+            adjDict = newGraph.vertexAdjacencies(vertexid=edge[0]);
+            self.assertTrue(edge[1] in adjDict, 'tests graph building consistence and coesion')
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
