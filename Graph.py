@@ -108,7 +108,6 @@ class Graph(object):
     """
 
     # adds a new vertex (which is a node) to the graph dictionary
-    @timeit
     def addVertex(self, vertexid):
         if not vertexid in self.graph:
             if isinstance(vertexid, Vertex):
@@ -121,7 +120,6 @@ class Graph(object):
 
     # removes a specific vertex (which is a node)  to the graph dictionary
     # it also removes all its conections
-    @timeit
     def removeVertex(self, vertexid):
         # Python dict doesnt not consider None as being of type EmptySet element
         if vertexid in self.graph:
@@ -137,7 +135,6 @@ class Graph(object):
     # the order matter here, what i mean is that
     # v1 will be predecessor of v2 and
     # v2 will be sucessor of v1
-    @timeit
     def connect(self, vertexid1, vertexid2, cost):
         if vertexid1 in self.graph and vertexid2 in self.graph:
             self.getVertex(vertexid1).addAdjacency(vertexid2, Weight(cost))
@@ -146,7 +143,6 @@ class Graph(object):
         else:
             return False
 
-    @timeit
     def disconnect(self, vertexid1, vertexid2):
         if vertexid1 in self.graph and vertexid2 in self.graph:
             # when removing adjacency of v2 onto v1, its also
@@ -162,18 +158,15 @@ class Graph(object):
     def graphMagnitude(self):
         return len(self.graph)
 
-    @timeit
     def graphVertexes(self):
         return self.graph.keys()
 
-    @timeit
     def getVertex(self, vertexid):
         if vertexid in self.graph:
             return self.graph.get(vertexid)
         else:
             return None
 
-    @timeit
     def vertexAdjacencies(self, vertexid):
         """
         This method is really useful on this point of view
@@ -187,7 +180,6 @@ class Graph(object):
         if vertexid in self.graph:
             return self.getVertex(vertexid).adjacencies
 
-    @timeit
     def vertexMagnitude(self, vertexid):
         if vertexid in self.graph:
             return len(self.getVertex(vertexid).adjacencies)
