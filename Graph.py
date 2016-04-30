@@ -4,7 +4,6 @@ import time
 class GraphValidationError(Exception):
     pass
 
-
 class Vertex(object):
 
     def __init__(self, vertexid):
@@ -13,29 +12,22 @@ class Vertex(object):
         # this gives better control of the graph
         self.adjacencies = {}
 
-    """
-    This method above is useful to convert a list of lists
-    graph-like structure to fit inside this Graph klazz data
-    structure
-    
-    @param edges_map: List of lists graph like structure
-    with the elements being a list like this [v1, v2, cost]
-    """
-    def newGraphFromEdgesMap(self, edges_map):
-        graph = Graph()
-        for edge in edges_map:
-            graph.addVertex(vertexid=edge[0])
-            graph.addVertex(vertexid=edge[1])
-            graph.connect(vertexid1=edge[0], vertexid2=edge[1])
-        return graph
-
     # add a name to the vertex (the name is like a property)
     def nameit(self, name):
         self.name = name
 
     # add a property to the vertex and give it a value
-    def addAdjacency(self, vertexid):
+    def addAdjacency(self, vertexid, cost):
+        # create a new adjacency but only if its not already there
+        if vertexid not in self.adjacencies:
+            # the key is the adjacency, and the value is the whatever cost it is
+            self.adjacencies[vertexid] = cost
+
+    def editAdjacency(self, vertexid, cost):
+        # inserts it only if its not already there
         if vertexid in self.adjacencies:
+            if cost != None:
+                self.adjacencies[vertexid] = (vertexid, cost)
             self.adjacencies[vertexid] = vertexid
 
     # remove an adjacency of this vertex but do not raise KeyError
@@ -43,6 +35,22 @@ class Vertex(object):
     def removeAdjacency(self, vertexid):
         if vertexid in self.adjacencies:
             del self.adjacencies[vertexid]
+
+class Weight(object):
+
+    def __init__(self, cost):
+        if cost != None:
+            self.cost = cost
+        else:
+            self.cost = 0
+        self.name = 'weigth_object_' + str(time.clock())
+
+    # add a name to the vertex (the name is like a property)
+    def nameit(self, name):
+        self.name = name
+
+    def getcost(self):
+        return self.cost
 
 class Graph(object):
     """
@@ -67,6 +75,34 @@ class Graph(object):
     def nameit(self, name):
         self.name = name
 
+    def __str__(self):
+        strgraph = '\n'
+        for vertexid in self.graph:
+            strgraph += 'vertex id:{:2}, is connected to: '.format(vertexid)
+            temp_adjacencies = self.vertexAdjacencies(vertexid=vertexid)
+            strgraph += 'adjacencies = ['
+            for key in temp_adjacencies:
+                strgraph += ' (adj:{:2}, cost:{:2}) '.format(key, temp_adjacencies.get(key).getcost())
+            strgraph += ']\n'
+        return '{}'.format(strgraph) + '\n'
+
+    """
+    This method above is useful to convert a list of lists
+    graph-like structure to fit inside this Graph klazz data
+    structure
+    
+    @param edges_map: List of lists graph like structure
+    with the elements being a list like this [v1, v2, cost]
+    """
+    @staticmethod
+    def newGraphFromEdgesMap(edges_map):
+        newGraph = Graph()
+        for edge in edges_map:
+                newGraph.addVertex(vertexid=edge[0])
+                newGraph.addVertex(vertexid=edge[1])
+                newGraph.connect(vertexid1=edge[0], vertexid2=edge[1], cost=edge[2])
+        return newGraph
+
     """
     Basic actions
     """
@@ -79,13 +115,9 @@ class Graph(object):
                 if not vertexid.vertexid in self.graph:
                     self.graph[vertexid] = vertexid
                     self.size = self.size + 1
-                else:
-                    raise GraphValidationError('This vertex already exists in the graph')
             else:
                 self.graph[vertexid] = Vertex(vertexid)
                 self.size = self.size + 1
-        else:
-            raise GraphValidationError('This vertex already exists in the graph')
 
     # removes a specific vertex (which is a node)  to the graph dictionary
     # it also removes all its conections
@@ -106,10 +138,10 @@ class Graph(object):
     # v1 will be predecessor of v2 and
     # v2 will be sucessor of v1
     @timeit
-    def connect(self, vertexid1, vertexid2):
+    def connect(self, vertexid1, vertexid2, cost):
         if vertexid1 in self.graph and vertexid2 in self.graph:
-            self.graph.get(vertexid1).adjacencies[vertexid2] = vertexid2
-            self.graph.get(vertexid2).adjacencies[vertexid1] = vertexid1
+            self.getVertex(vertexid1).addAdjacency(vertexid2, Weight(cost))
+            self.getVertex(vertexid2).addAdjacency(vertexid1, Weight(cost))
             return True
         else:
             return False
@@ -154,8 +186,6 @@ class Graph(object):
         """
         if vertexid in self.graph:
             return self.getVertex(vertexid).adjacencies
-        else:
-            raise GraphValidationError('Verify if vertexid={} exists before to get its adjacencies'.format(vertexid))
 
     @timeit
     def vertexMagnitude(self, vertexid):
