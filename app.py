@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+from Graph import Graph
 from FileReader import FileReader
-from Hospital import Hospital
+from AmbulancePositionSystem import AmbulancePositionSystem
 from RandomGraphGenerator import RandomGraphGenerator
 
 import sys
@@ -13,8 +14,9 @@ import threading
 """
 You can choose -e or --export to build the dat directory this will populate the
 dat directory with graphs You also can start the calculation of a graph at time
-just input in your terminal the following line: python app.py -i
-"dat/<name_of_file>" and them fo to the \"results\" directory at the root of
+just input in your terminal the following line: python app.py -a
+"dat/<name_of_file>" <emergency_node1> ... <emergency_nodeN> and them fo to the
+\"results\" directory at the root of. In this case we have only to nodes emergency!
 this software package to pick up your results. note: this program already build
 regular graphs with random costs, and this program also makes use of an good
 algorithm to to build random regular graphs, see RandomGraphGenerator.py for
@@ -25,24 +27,24 @@ Center. What I mean is that a ambulance A is related to medical center A and not
 to medical center B wich is related to ambulance B.
 """
 
-threadLock = threading.Lock()
 threads_list = []
 list_of_ambulances = []
+threadLock = threading.Lock()
 
-class SamuSlave(threading.Thread):
+class SamuOperatorSlave(threading.Thread):
 
-    def __init__(self, hospital, threadID, name):
+    def __init__(self, ambulance, threadID, name):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
-        self.hospital = hospital
+        self.ambulance = ambulance
 
     def run(self):
         threadLock.acquire()
-        print('reconstruction path, threading number {} working....'.format(self.threadID))
+        print('Reconstruction path, threading number {} working....'.format(self.threadID))
         try:
-            self.hospital.buildMatrixDistancesAndMAtrixRoutes()
-            self.hospital.pathInBetween()
+            self.ambulance.buildMatrixDistancesAndMAtrixRoutes()
+            self.ambulance.shortestPath()
         except KeyError:
             threadLock.release()
             raise Exception('Thread name: {}, id: {} found KeyError maybe in a certain graph dictionary'.format(self.name, self.threadID))
@@ -67,19 +69,24 @@ def start_samu_threadings(edges_list, threads_number, accident_location):
     # this is just to remove 'dat' directory from the list
     # that must contains only the localtion of the accident
     if len(accident_location) == 3:
+        # here we have the two locations because we have two files
+        # ambulan1.dat and ambulan2.dat. its one location for each
         del accident_location[:1]
 
     index = 0
     for edges_map in edges_list:
-        list_of_ambulances.append(Hospital(graph=edges_map, name="hospital_ambulancia_" + str(index),
-                                           emergency=accident_location, localization=edges_map[-1]))
-        print(list_of_ambulances[index])
+        # Build the graph first them send the graph to the class ambulance
+        graph_mapping=Graph.newGraphFromEdgesMap(edges_map)
+        list_of_ambulances.append(AmbulancePositionSystem(graph=graph_mapping,
+                                  name="ambulance_ambulancia_" + str(index),
+                                  emergency=accident_location[index],
+                                  localizations=[edges_map[:1][0][0], edges_map[:1][0][1]]))
         index = index + 1
 
     # Create new threads
     index = 0
-    for hospital in list_of_ambulances:
-        threads_list.append(SamuSlave(hospital, index, "operador_samu_" + str(index)))
+    for ambulance in list_of_ambulances:
+        threads_list.append(SamuOperatorSlave(ambulance, index, "operador_samu_" + str(index)))
         index = index + 1
 
     # Start new Threads
@@ -95,7 +102,7 @@ def start_samu_threadings(edges_list, threads_number, accident_location):
 def command_help_text():
     print("(1) python app.py -i <DAT_FILE_INPUT> (find best path)")
     print("(2) python app.py -e (export)")
-    print("(3) python app.py -h (help)") 
+    print("(3) python app.py -h (help)")
 
 def main(argv):
     try:
