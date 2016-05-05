@@ -1,12 +1,13 @@
 from Graph import Graph
-import sys
+
+INFINITE = 99999
 
 def Dijkstra(graph, distancesFromS, s):
 	distances = {}
 	distances[s] = 0
 	for v in distancesFromS.keys:
 		if (v != s):
-			distances[v] = sys.maxint
+			distances[v] = INFINITE
 	orderedVertexes = []
 	q = distancesFromS
 	while len(q) != 0:
