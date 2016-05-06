@@ -115,12 +115,14 @@ def main(argv):
             command_help_text()
             sys.exit()
         elif opt in ("-a", "--rota-acidente"):
-            # must be 'args' just for this case
-            # so we can get the values ao a edges
-            # that its marked with an accident
-            # them the threads will start to calculate
-            # the routes and display the list of routes
-            # in sorted form
+
+            ### must be 'args' just for this case
+            ### so we can get the values ao a edges
+            ### that its marked with an accident
+            ### them the threads will start to calculate
+            ### the routes and display the list of routes
+            ### in sorted form
+
             print (opt, args)
             if len(args) != 3 and args[0] is not 'dat':
                 raise Exception("must be 2 values to find a specific edge you need to type\n\
