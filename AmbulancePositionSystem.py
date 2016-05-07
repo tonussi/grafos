@@ -2,9 +2,8 @@ from Chronometer import timeit
 from FloydWarshall import FloydWarshall
 from Graph import Graph
 from Dijkstra import Dijkstra
-from enum import Enum
 
-class AlgorithmType(Enum):
+class AlgorithmTypeEnum:
     DIJKSTRA = 'DIJKSTRA'
     FLOYD = 'FLOYD'
 
@@ -45,58 +44,38 @@ class AmbulancePositionSystem(object):
                 strroutes += " {:4} ".format(self.routes[i][j])
             strdist += '\n'
             strroutes += '\n'
-        return 'Proximity Map: {:4}\n\
-Distances Matrix: {}\n\
-Routes Matrix: {}\n\
-Path to Emergency: {}\n\
-Costs to Emergency: {}\n\
-Hospital Name: {}\n\
-Where is the emergency at? {}\n\
-Where the Hospital is located at? {}\n'.format(strgraph, strdist, strroutes, self.path, self.costs,
-                                               self.name, self.emergency, self.localizations) + '\n'
+        res  = 'Proximity Map: {:4}\n'.format(strgraph)
+        res += 'Distances Matrix: {}\n'.format(strdist)
+        res += 'Routes Matrix: {}\n'.format(strroutes)
+        res += 'Path to Emergency: {}\n'.format(self.path)
+        res += 'Costs to Emergency: {}\n'.format(self.costs)
+        res += 'Hospital Name: {}\n'.format(self.name)
+        res += 'Where is the emergency at? {}\n'.format(self.emergency)
+        res += 'Where the Hospital is located at? {}\n'.format(self.localizations)
+        return res
 
     @timeit
     def buildMatrixDistancesAndMAtrixRoutes(self):
-        if (self.algorithm_type == AlgorithmType.DIJKSTRA):
+        if (self.algorithm_type == AlgorithmTypeEnum.DIJKSTRA):
             dijkstra = Dijkstra()
-            self.distances, self.routes = dijkstra.dijkstra(self.graph, self.localizations, self.emergency)
+            for l in self.localizations:
+                self.dijkstra = dijkstra.dijkstra(self.graph, l, self.emergency)
             del dijkstra
-        elif (self.algorithm_type == AlgorithmType.FLOYD):
+        elif (self.algorithm_type == AlgorithmTypeEnum.FLOYD):
             floyd_warshall = FloydWarshall()
             self.distances, self.routes = floyd_warshall.pathReconstruction(self.graph)
             del floyd_warshall
 
-    """
-    The usage is basically when invoking this
-    function the caller wants to find the path
-    with the costs related between A and B.
-
-    If B is direct related to A them the Algorithm should run O(1)
-    If the path between B and A is n arcs (or edges) them the algorithm runs O(n^2)
-    where n is the number of arcs, because the worst case scenario the function will
-    run through all the distances matrix and routes matrix to gather all the path and costs.
-
-    <code>
-    Algorithm PathInBetween(nodeA, nodeB):
-        if self.routes[nodeA][nodeB] is None:
-            return []
-        self.path = [u]
-        while u is not v
-            u = self.routes[u][v]
-            self.path.append(u)
-        return path
-    </code>
-    """
     @timeit
     def shortestPath(self):
-        #indexNodeDestination = self.emergency
-        #for index in range(len(self.localizations)):
-        #    indexNodeOrigin = self.localizations[index]
-        #    while ((indexNodeOrigin != indexNodeDestination) or (indexNodeOrigin == -1 or indexNodeDestination == -1)):
-        #        indexNodeOrigin = self.routes[indexNodeOrigin][indexNodeDestination]
-        #        print(indexNodeOrigin)
-        #        print(indexNodeOrigin, indexNodeDestination)
-        #        self.path[index].append(indexNodeOrigin)
-        #        self.costs[index].append(self.distances[indexNodeOrigin][indexNodeDestination])
-        #return self.routes
-        pass
+        if (self.algorithm_type == AlgorithmTypeEnum.DIJKSTRA):
+            pass
+        elif (self.algorithm_type == AlgorithmTypeEnum.FLOYD):
+            indexNodeDestination = self.emergency
+            for index in range(len(self.localizations)):
+                indexNodeOrigin = self.localizations[index]
+                while ((indexNodeOrigin is not indexNodeDestination) or (indexNodeOrigin == -1 or indexNodeDestination == -1)):
+                    indexNodeOrigin = self.routes[indexNodeOrigin][indexNodeDestination]
+                    self.path[index].append(indexNodeOrigin)
+                    self.costs[index].append(self.distances[indexNodeOrigin][indexNodeDestination])
+            return self.routes
