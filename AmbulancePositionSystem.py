@@ -1,6 +1,12 @@
 from Chronometer import timeit
 from FloydWarshall import FloydWarshall
 from Graph import Graph
+from Dijkstra import Dijkstra
+from enum import Enum
+
+class AlgorithmType(Enum):
+    DIJKSTRA = 'DIJKSTRA'
+    FLOYD = 'FLOYD'
 
 class AmbulancePositionSystemValidationError(Exception):
     pass
@@ -10,7 +16,7 @@ class AmbulancePositionSystem(object):
     <p>This class implement a Graph for the Medical Center's problem
     Its structured with basic functions and extends FloydWarshall actions.</p>"""
 
-    def __init__(self, graph, name, emergency, localizations):
+    def __init__(self, graph, name, emergency, localizations, algorithm_type):
         if not isinstance(graph, Graph):
             raise AmbulancePositionSystemValidationError('TypeGraph error, it must be a map of TypeGraph')
         self.graph = graph
@@ -19,6 +25,7 @@ class AmbulancePositionSystem(object):
         self.localizations = localizations
         self.routes = {}
         self.distances = {}
+        self.algorithm_type = algorithm_type
 
         # this is done to initialize the indexes of theses arrays
         # so we can store the results of the minimun costs paths
@@ -50,9 +57,14 @@ Where the Hospital is located at? {}\n'.format(strgraph, strdist, strroutes, sel
 
     @timeit
     def buildMatrixDistancesAndMAtrixRoutes(self):
-        floyd_warshall = FloydWarshall()
-        self.distances, self.routes = floyd_warshall.pathReconstruction(self.graph)
-        del floyd_warshall
+        if (self.algorithm_type == AlgorithmType.DIJKSTRA):
+            dijkstra = Dijkstra()
+            self.distances, self.routes = dijkstra.dijkstra(self.graph, self.localizations, self.emergency)
+            del dijkstra
+        elif (self.algorithm_type == AlgorithmType.FLOYD):
+            floyd_warshall = FloydWarshall()
+            self.distances, self.routes = floyd_warshall.pathReconstruction(self.graph)
+            del floyd_warshall
 
     """
     The usage is basically when invoking this
@@ -77,13 +89,14 @@ Where the Hospital is located at? {}\n'.format(strgraph, strdist, strroutes, sel
     """
     @timeit
     def shortestPath(self):
-        indexNodeDestination = self.emergency
-        for index in range(len(self.localizations)):
-            indexNodeOrigin = self.localizations[index]
-            while ((indexNodeOrigin != indexNodeDestination) or (indexNodeOrigin == -1 or indexNodeDestination == -1)):
-                indexNodeOrigin = self.routes[indexNodeOrigin][indexNodeDestination]
-                print(indexNodeOrigin)
-                print(indexNodeOrigin, indexNodeDestination)
-                self.path[index].append(indexNodeOrigin)
-                self.costs[index].append(self.distances[indexNodeOrigin][indexNodeDestination])
-        return self.routes
+        #indexNodeDestination = self.emergency
+        #for index in range(len(self.localizations)):
+        #    indexNodeOrigin = self.localizations[index]
+        #    while ((indexNodeOrigin != indexNodeDestination) or (indexNodeOrigin == -1 or indexNodeDestination == -1)):
+        #        indexNodeOrigin = self.routes[indexNodeOrigin][indexNodeDestination]
+        #        print(indexNodeOrigin)
+        #        print(indexNodeOrigin, indexNodeDestination)
+        #        self.path[index].append(indexNodeOrigin)
+        #        self.costs[index].append(self.distances[indexNodeOrigin][indexNodeDestination])
+        #return self.routes
+        pass
