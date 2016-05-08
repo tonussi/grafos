@@ -42,12 +42,8 @@ class SamuOperatorSlave(threading.Thread):
     def run(self):
         threadLock.acquire()
         print('Reconstruction path, threading number {} working....'.format(self.threadID))
-        try:
-            self.ambulance.buildMatrixDistancesAndMAtrixRoutes()
-            self.ambulance.shortestPath()
-        except KeyError:
-            threadLock.release()
-            raise Exception('Thread name: {}, id: {} found KeyError maybe in a certain graph dictionary'.format(self.name, self.threadID))
+        self.ambulance.buildMatrixDistancesAndMAtrixRoutes()
+        self.ambulance.shortestPath()
         threadLock.release()
 
 def exportNewRegularGraphsToDat(edgesArray=[10, 20, 50, 100, 500]):
@@ -65,7 +61,7 @@ def exportNewRegularGraphsToDat(edgesArray=[10, 20, 50, 100, 500]):
         dict_of_edges = graph_generator.convertSetToOrderedDict(set_of_edges)
         FileReader.writef('dat' + os.path.sep + 'results_' + str(i) + '_nodes' + '.dat', 'edges=' + str(dict_of_edges))
 
-def start_samu_threadings(edges_list, threads_number, accident_location):
+def start_samu_threadings_floyd(edges_list, threads_number, accident_location):
     # this is just to remove 'dat' directory from the list
     # that must contains only the localtion of the accident
     if len(accident_location) == 3:
@@ -78,9 +74,10 @@ def start_samu_threadings(edges_list, threads_number, accident_location):
         # Build the graph first them send the graph to the class ambulance
         graph_mapping=Graph.newGraphFromEdgesMap(edges_map)
         list_of_ambulances.append(AmbulancePositionSystem(graph=graph_mapping,
-                                  name="ambulance_ambulancia_" + str(index),
-                                  emergency=accident_location[index],
-                                  localizations=[edges_map[:1][0][0], edges_map[:1][0][1]]))
+                                                          name="ambulance_ambulancia_" + str(index),
+                                                          emergency=accident_location[index],
+                                                          localizations=[edges_map[:1][0][0], edges_map[:1][0][1]],
+                                                          algorithm_type='FLOYD'))
         index = index + 1
 
     # Create new threads
@@ -99,6 +96,42 @@ def start_samu_threadings(edges_list, threads_number, accident_location):
 
     return list_of_ambulances
 
+def start_samu_threadings_dijkstra(edges_list, threads_number, accident_location):
+    # this is just to remove 'dat' directory from the list
+    # that must contains only the localtion of the accident
+    if len(accident_location) == 3:
+        # here we have the two locations because we have two files
+        # ambulan1.dat and ambulan2.dat. its one location for each
+        del accident_location[:1]
+
+    index = 0
+    for edges_map in edges_list:
+        # Build the graph first them send the graph to the class ambulance
+        graph_mapping=Graph.newGraphFromEdgesMap(edges_map)
+        list_of_ambulances.append(AmbulancePositionSystem(graph=graph_mapping,
+                                                          name="ambulance_ambulancia_" + str(index),
+                                                          emergency=accident_location[index],
+                                                          localizations=[edges_map[:1][0][0], edges_map[:1][0][1]],
+                                                          algorithm_type='DIJKSTRA'))
+        index = index + 1
+
+    # Create new threads
+    index = 0
+    for ambulance in list_of_ambulances:
+        threads_list.append(SamuOperatorSlave(ambulance, index, "operador_samu_" + str(index)))
+        index = index + 1
+
+    # Start new Threads
+    for i in range(threads_number):
+        threads_list[i].start()
+
+    # Wait for all threads to complete
+    for t in threads_list:
+        t.join()
+
+    return list_of_ambulances
+
+
 def command_help_text():
     print("(1) python app.py -i <DAT_FILE_INPUT> (find best path)")
     print("(2) python app.py -e (export)")
@@ -106,7 +139,7 @@ def command_help_text():
 
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv, "h|a|e", ['--rota-acidente'])
+        opts, args = getopt.getopt(argv, "h|f|d|e", ['--floyd-warshall', '--edsger-dijkstra'])
     except getopt.GetoptError:
         command_help_text()
         raise Warning("warning: did you forget parameters?")
@@ -114,32 +147,51 @@ def main(argv):
         if opt in ['-h', '--help']:
             command_help_text()
             sys.exit()
-        elif opt in ("-a", "--rota-acidente"):
-            # must be 'args' just for this case
-            # so we can get the values ao a edges
-            # that its marked with an accident
-            # them the threads will start to calculate
-            # the routes and display the list of routes
-            # in sorted form
-            print (opt, args)
-            if len(args) != 3 and args[0] is not 'dat':
-                raise Exception("must be 2 values to find a specific edge you need to type\n\
-python app.py -a (or --route-accident) <dir> <number> <number> where\n\
-<dir> is the name of the directory where there are files with the graphs\n\
-data <number> are valid vertex that exist in the files all files must be\n\
-of equal node numbers but can have distinct costs for each edge\n")
+        elif opt in ("-f", "--floyd-warshall"):
+
+            if len(args) != 3 or args[0] is not 'dat':
+                raise Exception("must be python app.py -f dat <v1> <v2>\n")
             if os.path.exists(args[0]):
                 number_of_files, data_files_list = FileReader.readFiles(args[0])
-                start_samu_threadings(edges_list=data_files_list, threads_number=number_of_files, accident_location=args)
+                start_samu_threadings_floyd(edges_list=data_files_list, threads_number=number_of_files, accident_location=args)
+                print('visit results_floyd directory to see your results\n')
+    
+                if not os.path.exists('results_floyd'):
+                    try:
+                        os.makedirs('results_floyd')
+                    except IOError:
+                        raise Exception("it was impossible to create the given directory name\n")
+                for ambulances in list_of_ambulances:
+                    FileReader.writef('results_floyd' + os.path.sep + 'results_floyd_{}.txt'.format(ambulances.name), ambulances.__str__())
             else:
                 os.makedirs('dat')
                 try:
                     os.makedirs('dat')
                 except IOError:
                     raise Exception("it was impossible to create the given directory name\n")
-                raise Exception("dat does not exists in the root directory of this project\n\
-we created one for you, now all you have to do is put files with graph data\n\
-into the dat directory\n")
+                raise Exception("dat does not exists in the root directory of this project\n")
+        elif opt in ("-d", "--edsger-dijkstra"):
+
+            if len(args) != 6 or args[0] is not 'grafos':
+                raise Exception("must be python app.py -d grafos <v1> <v2> <v3> <v4> <v5>\n")
+            if os.path.exists(args[0]):
+                number_of_files, data_files_list = FileReader.readFiles(args[0])
+                start_samu_threadings_dijkstra(edges_list=data_files_list, threads_number=number_of_files, accident_location=args)
+                print('visit results_dijkstra directory to see your results\n')
+                if not os.path.exists('results_dijkstra'):
+                    try:
+                        os.makedirs('results_dijkstra')
+                    except IOError:
+                        raise Exception("it was impossible to create the given directory name\n")
+                for ambulances in list_of_ambulances:
+                    FileReader.writef('results_dijkstra' + os.path.sep + 'results_dijkstra_{}.txt'.format(ambulances.name), ambulances.__str__())
+            else:
+                os.makedirs('dat')
+                try:
+                    os.makedirs('dat')
+                except IOError:
+                    raise Exception("it was impossible to create the given directory name\n")
+                raise Exception("dat does not exists in the root directory of this project\n")
 
         elif opt in ("-e", "--export"):
             if not os.path.exists('dat'):
@@ -149,17 +201,6 @@ into the dat directory\n")
                     raise Exception("it was impossible to create the given directory name\n")
 
             exportNewRegularGraphsToDat()
-
-    print('visit results directory to see your results\n')
-
-    if not os.path.exists('results'):
-        try:
-            os.makedirs('results')
-        except IOError:
-            raise Exception("it was impossible to create the given directory name\n")
-
-    for ambulances in list_of_ambulances:
-        FileReader.writef('results' + os.path.sep + 'results_{}.txt'.format(ambulances.name), ambulances.__str__())
 
 if __name__ == '__main__':
     main(sys.argv[1:])
