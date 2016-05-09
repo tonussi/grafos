@@ -42,8 +42,8 @@ class SamuOperatorSlave(threading.Thread):
     def run(self):
         threadLock.acquire()
         print('Reconstruction path, threading number {} working....'.format(self.threadID))
-        self.ambulance.buildMatrixDistancesAndMAtrixRoutes()
-        self.ambulance.shortestPath()
+        self.ambulance.executeAlgorithm()
+        self.ambulance.constructShortestPath()
         threadLock.release()
 
 def exportNewRegularGraphsToDat(edgesArray=[10, 20, 50, 100, 500]):
@@ -74,10 +74,11 @@ def start_samu_threadings_floyd(edges_list, threads_number, accident_location):
         # Build the graph first them send the graph to the class ambulance
         graph_mapping=Graph.newGraphFromEdgesMap(edges_map)
         list_of_ambulances.append(AmbulancePositionSystem(graph=graph_mapping,
-                                                          name="ambulance_ambulancia_" + str(index),
-                                                          emergency=accident_location[index],
-                                                          localizations=[edges_map[:1][0][0], edges_map[:1][0][1]],
-                                                          algorithm_type='FLOYD'))
+            name="ambulance_ambulancia_" + str(index),
+            emergency=accident_location[index],
+            localizations=[edges_map[:1][0][0],
+                           edges_map[:1][0][1]],
+            algorithm_type='FLOYD'))
         index = index + 1
 
     # Create new threads
@@ -109,10 +110,11 @@ def start_samu_threadings_dijkstra(edges_list, threads_number, accident_location
         # Build the graph first them send the graph to the class ambulance
         graph_mapping=Graph.newGraphFromEdgesMap(edges_map)
         list_of_ambulances.append(AmbulancePositionSystem(graph=graph_mapping,
-                                                          name="ambulance_ambulancia_" + str(index),
-                                                          emergency=accident_location[index],
-                                                          localizations=[edges_map[:1][0][0], edges_map[:1][0][1]],
-                                                          algorithm_type='DIJKSTRA'))
+            name="ambulance_ambulancia_" + str(index),
+            emergency=accident_location[index],
+            localizations=[edges_map[:1][0][0],
+                           edges_map[:1][0][1]],
+            algorithm_type='DIJKSTRA'))
         index = index + 1
 
     # Create new threads
@@ -133,11 +135,15 @@ def start_samu_threadings_dijkstra(edges_list, threads_number, accident_location
 
 
 def command_help_text():
-    print("(1) python app.py -i <DAT_FILE_INPUT> (find best path)")
-    print("(2) python app.py -e (export)")
-    print("(3) python app.py -h (help)")
+    print("(1) python app.py -d grafos v1 v2 v3 v4 v5")
+    print("(2) python app.py --edsger-dijkstra grafos v1 v2 v3 v4 v5")
+    print("(3) python app.py -f dat v1 v2")
+    print("(4) python app.py ---floyd-warshall dat v1 v2")
+    print("(5) python app.py -e (optional export)")
+    print("(6) python app.py -h (help)")
 
 def main(argv):
+
     try:
         opts, args = getopt.getopt(argv, "h|f|d|e", ['--floyd-warshall', '--edsger-dijkstra'])
     except getopt.GetoptError:
@@ -148,14 +154,10 @@ def main(argv):
             command_help_text()
             sys.exit()
         elif opt in ("-f", "--floyd-warshall"):
-
-            if len(args) != 3 or args[0] is not 'dat':
-                raise Exception("must be python app.py -f dat <v1> <v2>\n")
             if os.path.exists(args[0]):
                 number_of_files, data_files_list = FileReader.readFiles(args[0])
                 start_samu_threadings_floyd(edges_list=data_files_list, threads_number=number_of_files, accident_location=args)
                 print('visit results_floyd directory to see your results\n')
-    
                 if not os.path.exists('results_floyd'):
                     try:
                         os.makedirs('results_floyd')
@@ -163,17 +165,7 @@ def main(argv):
                         raise Exception("it was impossible to create the given directory name\n")
                 for ambulances in list_of_ambulances:
                     FileReader.writef('results_floyd' + os.path.sep + 'results_floyd_{}.txt'.format(ambulances.name), ambulances.__str__())
-            else:
-                os.makedirs('dat')
-                try:
-                    os.makedirs('dat')
-                except IOError:
-                    raise Exception("it was impossible to create the given directory name\n")
-                raise Exception("dat does not exists in the root directory of this project\n")
         elif opt in ("-d", "--edsger-dijkstra"):
-
-            if len(args) != 6 or args[0] is not 'grafos':
-                raise Exception("must be python app.py -d grafos <v1> <v2> <v3> <v4> <v5>\n")
             if os.path.exists(args[0]):
                 number_of_files, data_files_list = FileReader.readFiles(args[0])
                 start_samu_threadings_dijkstra(edges_list=data_files_list, threads_number=number_of_files, accident_location=args)
@@ -185,21 +177,12 @@ def main(argv):
                         raise Exception("it was impossible to create the given directory name\n")
                 for ambulances in list_of_ambulances:
                     FileReader.writef('results_dijkstra' + os.path.sep + 'results_dijkstra_{}.txt'.format(ambulances.name), ambulances.__str__())
-            else:
-                os.makedirs('dat')
-                try:
-                    os.makedirs('dat')
-                except IOError:
-                    raise Exception("it was impossible to create the given directory name\n")
-                raise Exception("dat does not exists in the root directory of this project\n")
-
         elif opt in ("-e", "--export"):
             if not os.path.exists('dat'):
                 try:
                     os.makedirs('dat')
                 except IOError:
                     raise Exception("it was impossible to create the given directory name\n")
-
             exportNewRegularGraphsToDat()
 
 if __name__ == '__main__':
