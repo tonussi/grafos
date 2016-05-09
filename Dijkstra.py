@@ -11,25 +11,28 @@ class Dijkstra:
 	@param distancesFromS: all adjacencies of the starting node
 	@param s: target node
 	"""
-	def dijkstra(self, graph, distancesFromS, s):
-
-		if s not in graph.graph:
+	def dijkstra(self, graph, start, end):
+		if end not in graph.graph:
 			raise
 
 		distances = {}
-		distances[s] = 0
+		distances[end] = 0
 
-		for v in distancesFromS.adjacencies.keys:
-			if (v != s):
-				distances[v] = INFINITE
+		for vertexid in graph.vertexAdjacencies(start):
+			if (vertexid != end):
+				distances[vertexid] = INFINITE
 
 		orderedVertexes = []
-		q = distancesFromS
-		while len(q) != 0:
+		q = start
+
+		while len(q.adjacencies) != 0:
 			u = min(q, key=q.get)
 			del q[u]
+
 			orderedVertexes.append(u)
-			for v in graph.vertexAdjacencies(u).keys:
-				if distances[v] > distances[u] + graph.vertexAdjacencies(u)[v]:
-					distances[v] = distances[u] + graph.vertexAdjacencies(u)[v]
+			HeapSort.heapsort(orderedVertexes, len(orderedVertexes))
+
+			for vertexid in graph.vertexAdjacencies(u).keys:
+				if distances[vertexid] > distances[u] + graph.vertexAdjacencies(u)[vertexid]:
+					distances[vertexid] = distances[u] + graph.vertexAdjacencies(u)[vertexid]
 		return distances
