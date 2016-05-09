@@ -1,15 +1,17 @@
 class HeapSort:
 
-    def heapsort(self, a, n):
+    @staticmethod
+    def heapsort(a, n):
         for i in range((n // 2), -1, -1):
-            self.ajuste(a, i, n)
+            HeapSort.ajuste(a, i, n)
         for i in range((n - 1), -1, -1):
             temp = a[i]
             a[i] = a[0]
             a[0] = temp
-            self.ajuste(a, 0, i)
+            HeapSort.ajuste(a, 0, i)
 
-    def ajuste(self, a, i, n):
+    @staticmethod
+    def ajuste(a, i, n):
         aAux = a[i]
         j = 2 * i
         while j < n:
