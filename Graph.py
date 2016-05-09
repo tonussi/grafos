@@ -89,17 +89,21 @@ class Graph(object):
     This method above is useful to convert a list of lists
     graph-like structure to fit inside this Graph klazz data
     structure
-    
+
     @param edges_map: List of lists graph like structure
     with the elements being a list like this [v1, v2, cost]
     """
     @staticmethod
     def newGraphFromEdgesMap(edges_map):
         newGraph = Graph()
-        for edge in edges_map:
-                newGraph.addVertex(vertexid=edge[0])
-                newGraph.addVertex(vertexid=edge[1])
-                newGraph.connect(vertexid1=edge[0], vertexid2=edge[1], cost=edge[2])
+
+        for index in range(len(edges_map) - 1):
+            v1, v2, cost = edges_map[index]
+            if (v1 not in newGraph.graph):
+                newGraph.addVertex(vertexid=v1)
+            if (v2 not in newGraph.graph):
+                newGraph.addVertex(vertexid=v2)
+            newGraph.connect(vertexid1=v1, vertexid2=v2, cost=cost)
         return newGraph
 
     """

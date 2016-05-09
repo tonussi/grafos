@@ -4,10 +4,12 @@
 
 Nesse caso <dir> = 'dat' então um exemplo de entrada seria:
 
-`python app.py -a dat 3 5`
+`python app.py -f dat v1 v2` para executar o algoritmo de floyd sobre os grafos do diretório dat
+
+`python app.py -d grafos v1 v2 v3 v4 v5` para executar o algoritmo de dijkstra sobre os grafos do diretório grafos
 
 Atenção: O significado dos números após dat são os locais de acidente
-respectivamente aos arquivos inseridos dentro do diretório 'dat'.
+respectivamente aos arquivos inseridos dentro do diretório 'dat' ou 'grafos'.
 
 Assim você estará chamando a aplicação e enviando dois valores que representam os
 nós de onde a emergência se encontra. Mas entenda que a emergência se encontra entre

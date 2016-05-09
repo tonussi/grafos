@@ -1,13 +1,8 @@
-from Graph import Graph
 from Chronometer import timeit
 
-import os
 import random
-import time
 
 from collections import defaultdict
-from collections import OrderedDict
-
 
 class RandomGraphGenerator(object):
 
@@ -129,18 +124,18 @@ class RandomGraphGenerator(object):
         return edges
 
     @timeit
-    def convertSetToDict(self, set):
+    def convertSetToDict(self, setToConvert):
         temp = {}
-        for i in range(len(set)):
-            v1, v2, cost = set.pop()
+        for i in range(len(setToConvert)):
+            v1, v2, cost = setToConvert.pop()
             temp.setdefault(i, [v1, v2, cost])
         return temp
 
     @timeit
-    def convertSetToOrderedDict(self, set):
+    def convertSetToOrderedDict(self, setToConvert):
         temp = {}
-        set = sorted(set)
-        for i in range(len(set)):
-            v1, v2, cost = set.pop()
+        setToConvert = sorted(setToConvert)
+        for i in range(len(setToConvert)):
+            v1, v2, cost = setToConvert.pop()
             temp.setdefault(i, [v1, v2, cost])
         return temp

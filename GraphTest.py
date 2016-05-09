@@ -187,9 +187,11 @@ v4 and v5 dont have connection in between')
                      [ 2,  4 , 0  ]]
         newGraph = Graph.newGraphFromEdgesMap(edges_map)
 
-        for edge in edges_map:
-            adjDict = newGraph.vertexAdjacencies(vertexid=edge[0]);
-            self.assertTrue(edge[1] in adjDict, 'tests graph building consistence and coesion')
+        # this test the graph constrution from a mapping of edges with its costs
+        for index in range(len(edges_map) - 1):
+            v1, v2, cost = edges_map[index]
+            self.assertTrue(cost == newGraph.vertexAdjacencies(v1).get(v2).getcost(),
+                            'test graph\'s consistence in costs and coesion in connections')
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
