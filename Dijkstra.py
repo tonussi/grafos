@@ -12,6 +12,7 @@ class Dijkstra:
 	@param s: target node
 	"""
 	def dijkstra(self, graph, distancesFromS, s):
+		heapsort = HeapSort()
 
 		if s not in graph.graph:
 			raise
@@ -25,10 +26,14 @@ class Dijkstra:
 
 		orderedVertexes = []
 		q = distancesFromS
+
 		while len(q) != 0:
 			u = min(q, key=q.get)
 			del q[u]
+
 			orderedVertexes.append(u)
+			heapsort.heapsort(orderedVertexes, len(orderedVertexes))
+
 			for v in graph.vertexAdjacencies(u).keys:
 				if distances[v] > distances[u] + graph.vertexAdjacencies(u)[v]:
 					distances[v] = distances[u] + graph.vertexAdjacencies(u)[v]
