@@ -1,4 +1,5 @@
 import time
+from random import randint
 
 class GraphValidationError(Exception):
     pass
@@ -94,10 +95,9 @@ class Graph(object):
     with the elements being a list like this [v1, v2, cost]
     """
     @staticmethod
-    def newGraphFromEdgesMap(edges_map):
+    def newGraphFromEdgesMap(edges_map, size_map):
         newGraph = Graph()
-
-        for index in range(len(edges_map) - 1):
+        for index in range(size_map):
             v1, v2, cost = edges_map[index]
             if (v1 not in newGraph.graph):
                 newGraph.addVertex(vertexid=v1)
@@ -169,6 +169,10 @@ class Graph(object):
             return self.graph.get(vertexid)
         else:
             return None
+
+    def getRandomVertexId(self):
+        vertexList = list(self.graph.values())
+        return vertexList[randint(0, len(vertexList) - 1)].vertexid
 
     def vertexAdjacencies(self, vertexid):
         """
