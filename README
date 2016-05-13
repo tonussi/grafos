@@ -6,7 +6,7 @@ Nesse caso <dir> = 'dat' então um exemplo de entrada seria:
 
 `python app.py -f dat v1 v2` para executar o algoritmo de floyd sobre os grafos do diretório dat
 
-`python app.py -d grafos v1 v2 v3 v4 v5` para executar o algoritmo de dijkstra sobre os grafos do diretório grafos
+`python app.py -d grafos v1 v2 v3 v4 v5 v6` para executar o algoritmo de dijkstra sobre os grafos do diretório grafos
 
 Atenção: O significado dos números após dat são os locais de acidente
 respectivamente aos arquivos inseridos dentro do diretório 'dat' ou 'grafos'.
