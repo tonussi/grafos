@@ -55,20 +55,22 @@ class AmbulancePositionSystem(object):
     def __str__(self):
         
         strgraph = str(self.graph)
-        strdist = '\n\nShortest Distances One: \n\n'
-        strroutes = '\n\nShortest Routes One: \n\n'
-        strpath = '\n'
-        strcost = '\n'
+        strdist = '\nShortest Distances One:\n'
+        strroutes = '\nShortest Routes One:\n'
+        strpath = '\nShortest way (more readable) for ambulance one:\n'
+        strcost = '\nShortest cost (more readable) for ambulance one:\n'
 
         if (self.algorithm_type == AlgorithmTypeEnum.DIJKSTRA):
 
             for local in self.localizations:
+
                 for d in self.distances[local]:
                     strdist += "\t(Node:{:4}, Cost:{:4})\n".format(d, self.distances[local][d])
-                strdist += '\n\nShortest Distances Two: \n\n\t'
+                strdist += '\n\nShortest Distances Two: \n\n'
+
                 for r in self.routes[local]:
                     strroutes += "\t(Node:{:4}, Next Node:{:4})\n".format(r, self.routes[local][r])
-                strroutes += '\n\nShortest Routes Two: \n\n\t'
+                strroutes += '\n\nShortest Routes Two: \n\n'
 
         elif (self.algorithm_type == AlgorithmTypeEnum.FLOYD):
 
@@ -79,21 +81,23 @@ class AmbulancePositionSystem(object):
                 strdist += '\n'
                 strroutes += '\n'
 
-        for i in self.path:
-            for j in i:
-                strpath += " {:2} -> ".format(j)
-            strpath += '\n'
+        for p in self.path:
+            strpath += '\nThe shortest path (easy readable) for {}\n\t to go to the emergency at vertex position {}, is the following:\n\n'.format(self.name, self.emergency)
+            strpath += '\t'
+            for s in range(len(p) - 1):
+                strpath += '{:4} -> '.format(s)
+            strpath += '{:4}\n'.format(p[len(p)-1])
 
         if (self.algorithm_type == AlgorithmTypeEnum.DIJKSTRA):
 
-            strcost += "\n\tSee Matrix Routes to Find out the Costs.\n"
+            strcost += "\tSee Matrix Routes to Find out the Costs.\n"
 
         elif (self.algorithm_type == AlgorithmTypeEnum.FLOYD):
 
             for i in self.costs:
                 for j in i:
                     strcost += " {:2} ".format(j)
-                strcost += '\n'
+                strcost += 'Shortest path for ambulance two:\n'
 
         res  = 'Proximity Map:                    {}\n'.format(strgraph)
         res += 'Distances Matrix:                 {}\n'.format(strdist)
@@ -127,6 +131,7 @@ class AmbulancePositionSystem(object):
 
     @timeit
     def constructShortestPath(self):
+
         if (self.algorithm_type == AlgorithmTypeEnum.DIJKSTRA):
 
             self.shortestPathDijkstra()
@@ -162,7 +167,7 @@ class AmbulancePositionSystem(object):
                 break
             end = R1[end]
         Path.reverse()
-        self.path[0].append(Path)
+        self.path[0] = Path
 
     def __solvePathTwo(self, S2, R2):
 
@@ -174,7 +179,7 @@ class AmbulancePositionSystem(object):
                 break
             end = R2[end]
         Path.reverse()
-        self.path[1].append(Path)
+        self.path[1] = Path
 
     def shortestPathFloyd(self):
 
