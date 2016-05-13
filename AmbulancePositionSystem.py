@@ -18,8 +18,7 @@ class AmbulancePositionSystem(object):
     def __init__(self, graph, name, emergency, localizations, algorithm_type):
 
         if not isinstance(graph, Graph):
-            raise AmbulancePositionSystemValidationError(
-                'TypeGraph error, it must be a map of TypeGraph')
+            raise AmbulancePositionSystemValidationError('TypeGraph error, it must be a map of TypeGraph')
 
         self.graph = graph
         self.name = name
