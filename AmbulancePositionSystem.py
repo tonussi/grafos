@@ -55,19 +55,19 @@ class AmbulancePositionSystem(object):
     def __str__(self):
         
         strgraph = str(self.graph)
-        strdist = '\n\nShortest Distances One: \n\n\t'
-        strroutes = '\n\nShortest Routes One: \n\n\t'
+        strdist = '\n\nShortest Distances One: \n\n'
+        strroutes = '\n\nShortest Routes One: \n\n'
         strpath = '\n'
         strcost = '\n'
 
         if (self.algorithm_type == AlgorithmTypeEnum.DIJKSTRA):
 
             for local in self.localizations:
-                for d in self.distances[local].values():
-                    strdist += " {:4} ".format(d)
+                for d in self.distances[local]:
+                    strdist += "\t(Node:{:4}, Cost:{:4})\n".format(d, self.distances[local][d])
                 strdist += '\n\nShortest Distances Two: \n\n\t'
-                for r in self.routes[local].values():
-                    strroutes += " {:4} ".format(r)
+                for r in self.routes[local]:
+                    strroutes += "\t(Node:{:4}, Next Node:{:4})\n".format(r, self.routes[local][r])
                 strroutes += '\n\nShortest Routes Two: \n\n\t'
 
         elif (self.algorithm_type == AlgorithmTypeEnum.FLOYD):
@@ -81,13 +81,19 @@ class AmbulancePositionSystem(object):
 
         for i in self.path:
             for j in i:
-                strpath += " {:2} ".format(j)
+                strpath += " {:2} -> ".format(j)
             strpath += '\n'
 
-        for i in self.costs:
-            for j in i:
-                strcost += " {:2} ".format(j)
-            strcost += '\n'
+        if (self.algorithm_type == AlgorithmTypeEnum.DIJKSTRA):
+
+            strcost += "\n\tSee Matrix Routes to Find out the Costs.\n"
+
+        elif (self.algorithm_type == AlgorithmTypeEnum.FLOYD):
+
+            for i in self.costs:
+                for j in i:
+                    strcost += " {:2} ".format(j)
+                strcost += '\n'
 
         res  = 'Proximity Map:                    {}\n'.format(strgraph)
         res += 'Distances Matrix:                 {}\n'.format(strdist)
@@ -105,14 +111,13 @@ class AmbulancePositionSystem(object):
         if (self.algorithm_type == AlgorithmTypeEnum.DIJKSTRA):
 
             # in the case for dijkstra we have to run the procedure twice
-            for local in self.localizations:
+            for index in range(len(self.localizations)):
 
                 d = Dijkstra()
+                D, P = d.dijkstra(self.graph, self.localizations[index], self.emergency)
 
-                D, P = d.dijkstra(self.graph, local, self.emergency)
-
-                self.distances[local] = D
-                self.routes[local]    = P
+                self.distances[self.localizations[index]] = D
+                self.routes[self.localizations[index]]    = P
 
         elif (self.algorithm_type == AlgorithmTypeEnum.FLOYD):
 
@@ -141,18 +146,11 @@ class AmbulancePositionSystem(object):
         # 4) if dijkstra finds the PATH then when we pick a node in this path
         #    the next path have must be in the adjacencies of the predecessor
 
-        S1, S2 = self.localizations
+        S1, S2 = self.localizations[0], self.localizations[1]
         R1, R2 = self.routes[S1], self.routes[S2]
 
         self.__solvePathOne(S1, R1)
         self.__solvePathTwo(S2, R2)
-
-        # There is a way to create branching process to execute the solving paths
-        # branch = pool.Pool()
-        # shortPathOne = branch.apply_async(self.solvePathOne, [S1, R1])
-        # shortPathTwo = branch.apply_async(self.solvePathTwo, [S2, R2])
-        # postProcessingOne = shortPathOne.get(timeout=10)
-        # postProcessingTwo = shortPathTwo.get(timeout=10)
 
     def __solvePathOne(self, S1, R1):
 
