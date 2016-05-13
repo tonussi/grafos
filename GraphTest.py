@@ -193,6 +193,10 @@ v4 and v5 dont have connection in between')
             self.assertTrue(cost == newGraph.vertexAdjacencies(v1).get(v2).getcost(),
                             'test graph\'s consistence in costs and coesion in connections')
 
+    def testGetRandomVertexId(self):
+        self.assertTrue(self.graph.getRandomVertexId().vertexid in self.graph.graph,
+                        'retrieve random vertex must be inside the graph')
+
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
