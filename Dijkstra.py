@@ -1,38 +1,40 @@
 from Graph import Graph
 from HeapSort import HeapSort
+from Chronometer import timeit
+from PriorityDict import PriorityDict
 
 INFINITE = 99999
 
 class Dijkstra:
 
-	"""
-	This is the dijkstra method to find the shortest path
-	@param graph: a graph of type Graph
-	@param distancesFromS: all adjacencies of the starting node
-	@param s: target node
-	"""
-	def dijkstra(self, graph, start, end):
-		if end not in graph.graph:
-			raise
+    """
+    This is the dijkstra method to find the shortest path
+    @param graph: a graph of type Graph
+    @param distancesFromS: all adjacencies of the starting node
+    @param s: target node
+    """
+    @timeit
+    def dijkstra(self, G, start, end=None):
 
-		distances = {}
-		distances[end] = 0
+        D = {}  # dictionary of final distances
+        P = {}  # dictionary of predecessors
+        Q = PriorityDict()  # estimated distances of non-final vertices
+        Q[start] = 0 # add zero cost
 
-		for vertexid in graph.vertexAdjacencies(start):
-			if (vertexid != end):
-				distances[vertexid] = INFINITE
+        for v in Q:
+            D[v] = Q[v]
 
-		orderedVertexes = []
-		q = start
+            if v == end:
+                break
 
-		while len(q.adjacencies) != 0:
-			u = min(q, key=q.get)
-			del q[u]
+            for w in G.getVertex(v).adjacencies:
+                vwLength = D.get(v) + G.vertexAdjacencies(v).get(w).getcost()
 
-			orderedVertexes.append(u)
-			HeapSort.heapsort(orderedVertexes, len(orderedVertexes))
+                if w in D:
+                    if vwLength < D.get(w):
+                        raise ValueError("Dijkstra: found better path to already-final vertex")
+                elif w not in Q or vwLength < Q.get(w):
+                    Q[w] = vwLength
+                    P[w] = v
 
-			for vertexid in graph.vertexAdjacencies(u).keys:
-				if distances[vertexid] > distances[u] + graph.vertexAdjacencies(u)[vertexid]:
-					distances[vertexid] = distances[u] + graph.vertexAdjacencies(u)[vertexid]
-		return distances
+        return D, P
