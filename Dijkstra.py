@@ -8,7 +8,8 @@ INFINITE = 99999
 class Dijkstra:
 
     """
-    This is the dijkstra method to find the shortest path
+    Find shortest paths from the  start vertex to all vertices nearer than or equal to the end.
+
     @param graph: a graph of type Graph
     @param distancesFromS: all adjacencies of the starting node
     @param s: target node
