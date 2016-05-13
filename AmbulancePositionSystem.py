@@ -185,11 +185,11 @@ class AmbulancePositionSystem(object):
 
         indexNodeDestination = int(self.emergency)
 
-        for localid in self.localizations:
-            indexNodeOrigin = localid
+        for index in range(len(self.localizations)):
+            indexNodeOrigin = self.localizations[index]
 
-            for i in range(len(self.D)):
-                for j in range(len(self.D)):
+            for i in range(len(self.distances)):
+                for j in range(len(self.distances)):
                     temp = self.routes[i][j]
                     if (temp == indexNodeDestination != indexNodeOrigin):
-                        self.path[localid].append(temp)
+                        self.path[index].append(temp)
