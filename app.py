@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # encoding: utf-8
 
 from Graph import Graph
@@ -10,22 +9,6 @@ import sys
 import getopt
 import os
 import threading
-
-"""
-You can choose -e or --export to build the dat directory this will populate the
-dat directory with graphs You also can start the calculation of a graph at time
-just input in your terminal the following line: python app.py -a
-"dat/<name_of_file>" <emergency_node1> ... <emergency_nodeN> and them fo to the
-\"results\" directory at the root of. In this case we have only to nodes emergency!
-this software package to pick up your results. note: this program already build
-regular graphs with random costs, and this program also makes use of an good
-algorithm to to build random regular graphs, see RandomGraphGenerator.py for
-more information. Another thing to account is that the program divide the
-efforts to find the best path into to running threads. each thread called Samu
-Slave will calculate the best path for the ambulance to arrive at his Medical
-Center. What I mean is that a ambulance A is related to medical center A and not
-to medical center B wich is related to ambulance B.
-"""
 
 threads_list = []
 list_of_ambulances = []
@@ -41,7 +24,6 @@ class SamuOperatorSlave(threading.Thread):
 
     def run(self):
         threadLock.acquire()
-        print('Reconstruction path, threading number {} working....'.format(self.threadID))
         self.ambulance.executeAlgorithm()
         self.ambulance.constructShortestPath()
         threadLock.release()
@@ -62,22 +44,19 @@ def exportNewRegularGraphsToDat(edgesArray=[10, 20, 50, 100, 500]):
         FileReader.writef('dat' + os.path.sep + 'results_' + str(i) + '_nodes' + '.dat', 'edges=' + str(dict_of_edges))
 
 def start_samu_threadings_floyd(edges_list, threads_number, accident_location):
-    # this is just to remove 'dat' directory from the list
-    # that must contains only the localtion of the accident
     if len(accident_location) == 3:
-        # here we have the two locations because we have two files
-        # ambulan1.dat and ambulan2.dat. its one location for each
         del accident_location[:1]
+    else:
+        raise
 
     index = 0
     for edges_map in edges_list:
         # Build the graph first them send the graph to the class ambulance
-        graph_mapping=Graph.newGraphFromEdgesMap(edges_map)
+        graph_mapping=Graph.newGraphFromEdgesMap(edges_map, len(edges_map) - 1)
         list_of_ambulances.append(AmbulancePositionSystem(graph=graph_mapping,
             name="ambulance_ambulancia_" + str(index),
             emergency=accident_location[index],
-            localizations=[edges_map[:1][0][0],
-                           edges_map[:1][0][1]],
+            localizations=[edges_map[:1][0][0], edges_map[:1][0][1]],
             algorithm_type='FLOYD'))
         index = index + 1
 
@@ -89,6 +68,7 @@ def start_samu_threadings_floyd(edges_list, threads_number, accident_location):
 
     # Start new Threads
     for i in range(threads_number):
+        print('Reconstruction path, threading number {} working....'.format(threads_list[i].threadID))
         threads_list[i].start()
 
     # Wait for all threads to complete
@@ -98,22 +78,22 @@ def start_samu_threadings_floyd(edges_list, threads_number, accident_location):
     return list_of_ambulances
 
 def start_samu_threadings_dijkstra(edges_list, threads_number, accident_location):
-    # this is just to remove 'dat' directory from the list
-    # that must contains only the localtion of the accident
-    if len(accident_location) == 3:
-        # here we have the two locations because we have two files
-        # ambulan1.dat and ambulan2.dat. its one location for each
+    if len(accident_location) == 7:
         del accident_location[:1]
+    else:
+        raise
 
     index = 0
     for edges_map in edges_list:
         # Build the graph first them send the graph to the class ambulance
-        graph_mapping=Graph.newGraphFromEdgesMap(edges_map)
+        graph_mapping=Graph.newGraphFromEdgesMap(edges_map, len(edges_map))
         list_of_ambulances.append(AmbulancePositionSystem(graph=graph_mapping,
             name="ambulance_ambulancia_" + str(index),
+            # for each file we send the emegency localization to the APS builder
             emergency=accident_location[index],
-            localizations=[edges_map[:1][0][0],
-                           edges_map[:1][0][1]],
+            # each file have we build the localizations extracting the last row
+            localizations=[edges_map[:1][0][0], edges_map[:1][0][1]],
+            # than we choose a strategy called DIJKSTRA to process the data
             algorithm_type='DIJKSTRA'))
         index = index + 1
 
@@ -125,6 +105,7 @@ def start_samu_threadings_dijkstra(edges_list, threads_number, accident_location
 
     # Start new Threads
     for i in range(threads_number):
+        print('Reconstruction path, threading number {} working....'.format(threads_list[i].threadID))
         threads_list[i].start()
 
     # Wait for all threads to complete
@@ -135,8 +116,8 @@ def start_samu_threadings_dijkstra(edges_list, threads_number, accident_location
 
 
 def command_help_text():
-    print("(1) python app.py -d grafos v1 v2 v3 v4 v5")
-    print("(2) python app.py --edsger-dijkstra grafos v1 v2 v3 v4 v5")
+    print("(1) python app.py -d grafos v1 v2 v3 v4 v5 v6")
+    print("(2) python app.py --edsger-dijkstra grafos v1 v2 v3 v4 v5 v6")
     print("(3) python app.py -f dat v1 v2")
     print("(4) python app.py ---floyd-warshall dat v1 v2")
     print("(5) python app.py -e (optional export)")
