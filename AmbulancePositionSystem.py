@@ -3,15 +3,12 @@ from FloydWarshall import FloydWarshall
 from Graph import Graph
 from Dijkstra import Dijkstra
 
-
 class AlgorithmTypeEnum:
     DIJKSTRA = 'DIJKSTRA'
     FLOYD = 'FLOYD'
 
-
 class AmbulancePositionSystemValidationError(Exception):
     pass
-
 
 class AmbulancePositionSystem(object):
     """<h1>Simple Graph Class Impl of the Medical Center's problem</h1>
@@ -26,7 +23,14 @@ class AmbulancePositionSystem(object):
 
         self.graph = graph
         self.name = name
-        self.emergency = emergency
+
+        if type(emergency) is not int:
+            emergency = int(emergency)
+
+        if emergency in self.graph.graph:
+            self.emergency = emergency
+        else:
+            raise AmbulancePositionSystemValidationError('This EMERGENCY NODE = {} is not present in the graph map = {}, GRAPH => {}\n'.format(emergency, name, self.graph.graph.keys()))
 
         # choose two random vertexes in the graph to be the Hospital
         # where the ambulances are located at
@@ -52,16 +56,23 @@ class AmbulancePositionSystem(object):
     def __str__(self):
         
         strgraph = str(self.graph)
-        strdist = '\n'
-        strroutes = '\n'
+        strdist = '\n\nShortest Distances One: \n\n\t'
+        strroutes = '\n\nShortest Routes One: \n\n\t'
         strpath = '\n'
         strcost = '\n'
 
         if (self.algorithm_type == AlgorithmTypeEnum.DIJKSTRA):
-            strdist += "\t\tDijkstra does not need a Route Matrix\n"
-            strroutes += "\t\tDijkstra does not need a Cost Matrix\n"
+
+            for local in self.localizations:
+                for d in self.distances[local].values():
+                    strdist += " {:4} ".format(d)
+                strdist += '\n\nShortest Distances Two: \n\n\t'
+                for r in self.routes[local].values():
+                    strroutes += " {:4} ".format(r)
+                strroutes += '\n\nShortest Routes Two: \n\n\t'
 
         elif (self.algorithm_type == AlgorithmTypeEnum.FLOYD):
+
             for i in range(len(self.distances)):
                 for j in range(len(self.distances)):
                     strdist += " {:4} ".format(self.distances[i][j])
@@ -101,7 +112,8 @@ class AmbulancePositionSystem(object):
 
                 D, P = d.dijkstra(self.graph, local, self.emergency)
 
-                self.distances[local], self.routes[local] = D, P
+                self.distances[local] = D
+                self.routes[local]    = P
 
         elif (self.algorithm_type == AlgorithmTypeEnum.FLOYD):
 
@@ -133,20 +145,29 @@ class AmbulancePositionSystem(object):
         S1, S2 = self.localizations
         R1, R2 = self.routes[S1], self.routes[S2]
 
+        self.__solvePathOne(S1, R1)
+        self.__solvePathTwo(S2, R2)
+
+        # There is a way to create branching process to execute the solving paths
+        # branch = pool.Pool()
+        # shortPathOne = branch.apply_async(self.solvePathOne, [S1, R1])
+        # shortPathTwo = branch.apply_async(self.solvePathTwo, [S2, R2])
+        # postProcessingOne = shortPathOne.get(timeout=10)
+        # postProcessingTwo = shortPathTwo.get(timeout=10)
+
+    def __solvePathOne(self, S1, R1):
+
         end = self.emergency
         Path = []
         while True:
             Path.append(end)
             if end == S1:
                 break
-            if end in R1:
-                end = R1[end]
-            else:
-                print("This vertex={} do not exist in the path found by Dijkstra.".format(end))
-                break
+            end = R1[end]
         Path.reverse()
-        self.path[S1].append(Path)
-        print('Shortest Path Ambulance A at {}: '.format(S1), Path)
+        self.path[0].append(Path)
+
+    def __solvePathTwo(self, S2, R2):
 
         end = self.emergency
         Path = []
@@ -154,16 +175,12 @@ class AmbulancePositionSystem(object):
             Path.append(end)
             if end == S2:
                 break
-            if end in R2:
-                end = R2[end]
-            else:
-                print("This vertex={} do not exist in the path found by Dijkstra.".format(end))
-                break
+            end = R2[end]
         Path.reverse()
-        self.path[S2].append(Path)
-        print('Shortest Path Ambulance A at {}: '.format(S1), Path)
+        self.path[1].append(Path)
 
     def shortestPathFloyd(self):
+
         indexNodeDestination = int(self.emergency)
 
         for localid in self.localizations:
