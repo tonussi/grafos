@@ -118,6 +118,10 @@ class AmbulancePositionSystem(object):
             for index in range(len(self.localizations)):
 
                 d = Dijkstra()
+
+                # Execute dijkstra with builin heap sort
+                d.dijkstraWithBuiltinHeap(self.graph, self.localizations[index], self.emergency)
+
                 D, P = d.dijkstra(self.graph, self.localizations[index], self.emergency)
 
                 self.distances[self.localizations[index]] = D
@@ -129,7 +133,6 @@ class AmbulancePositionSystem(object):
 
             self.distances, self.routes = floyd_warshall.pathReconstruction(self.graph)
 
-    @timeit
     def constructShortestPath(self):
 
         if (self.algorithm_type == AlgorithmTypeEnum.DIJKSTRA):
@@ -140,6 +143,7 @@ class AmbulancePositionSystem(object):
 
             self.shortestPathFloyd()
 
+    @timeit
     def shortestPathDijkstra(self):
         # 1) this line is to pick get the adjacencies of a node in the graph
 
