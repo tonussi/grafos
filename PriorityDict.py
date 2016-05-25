@@ -36,7 +36,6 @@ class PriorityDict(dict):
         heap = self.__heap
         if len(heap) > 2 * len(self):
             self.__heap = [(v, k) for k, v in self.iteritems()]
-            # using heap sort as algorithm
             hs.heapsort(self.__heap, len(self.__heap))
         else:
             newPair = (val, key)
