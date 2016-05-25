@@ -1,3 +1,5 @@
+from HeapSort import HeapSort as hs
+
 class PriorityDict(dict):
     def __init__(self):
         self.__heap = []
@@ -20,7 +22,7 @@ class PriorityDict(dict):
                 heap[insertionPoint] = heap[smallChild]
                 insertionPoint = smallChild
         return heap[0][1]
-    
+
     def __iter__(self):
         def iterfn():
             while len(self) > 0:
@@ -28,13 +30,14 @@ class PriorityDict(dict):
                 yield x
                 del self[x]
         return iterfn()
-    
-    def __setitem__(self,key,val):
+
+    def __setitem__(self, key, val):
         dict.__setitem__(self,key,val)
         heap = self.__heap
         if len(heap) > 2 * len(self):
             self.__heap = [(v, k) for k, v in self.iteritems()]
-            self.__heap.sort()
+            # using heap sort as algorithm
+            hs.heapsort(self.__heap, len(self.__heap))
         else:
             newPair = (val, key)
             insertionPoint = len(heap)
@@ -44,7 +47,7 @@ class PriorityDict(dict):
                 heap[insertionPoint] = heap[(insertionPoint-1) // 2]
                 insertionPoint = (insertionPoint-1) // 2
             heap[insertionPoint] = newPair
-    
+
     def setdefault(self, key, val):
         if key not in self:
             self[key] = val
