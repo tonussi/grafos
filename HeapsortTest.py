@@ -1,6 +1,5 @@
 import unittest, random
 from HeapSort import HeapSort
-from test.support import bigaddrspacetest
 
 class GraphTest(unittest.TestCase):
 
@@ -27,7 +26,6 @@ class GraphTest(unittest.TestCase):
         HeapSort.heapsort(self.evenarray, len(self.evenarray))
         for i in range(1, len(self.evenarray) - 1):
             self.assertTrue(self.evenarray[i] <= self.evenarray[i + 1], 'oddarray[{}] should be leq than oddarray[{}]'.format(i, i + 1))
-
 
     """
     Testing against 2kk random elements is passing
