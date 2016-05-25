@@ -1,4 +1,4 @@
-import time
+import time, threading
 
 def timeit(method):
     """To use this functionality you have to put
@@ -8,6 +8,7 @@ def timeit(method):
         ts = time.time()
         result = method(*args, **kw)
         te = time.time()
-        print('%r - %2.10f sec' % (method.__name__, te - ts))
+        slave = threading.current_thread()
+        print('Thread id={%i} name={%s} - %r - %2.10f sec\n' % (slave.tid, slave.name, method.__name__, te - ts))
         return result
     return timed
