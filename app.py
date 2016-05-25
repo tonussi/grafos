@@ -16,9 +16,9 @@ threadLock = threading.Lock()
 
 class SamuOperatorSlave(threading.Thread):
 
-    def __init__(self, ambulance, threadID, name):
+    def __init__(self, ambulance, tid, name):
         threading.Thread.__init__(self)
-        self.threadID = threadID
+        self.tid = tid
         self.name = name
         self.ambulance = ambulance
 
@@ -68,7 +68,7 @@ def start_samu_threadings_floyd(edges_list, threads_number, accident_location):
 
     # Start new Threads
     for i in range(threads_number):
-        print('Reconstruction path, threading number {} working....'.format(threads_list[i].threadID))
+        print('Reconstruction path, threading number {} working....'.format(threads_list[i].tid))
         threads_list[i].start()
 
     # Wait for all threads to complete
@@ -105,7 +105,7 @@ def start_samu_threadings_dijkstra(edges_list, threads_number, accident_location
 
     # Start new Threads
     for i in range(threads_number):
-        print('Reconstruction path, threading number {} working....'.format(threads_list[i].threadID))
+        print('Reconstruction path, threading number {} working....'.format(threads_list[i].tid))
         threads_list[i].start()
 
     # Wait for all threads to complete
