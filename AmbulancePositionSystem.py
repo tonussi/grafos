@@ -5,7 +5,7 @@ from Dijkstra import Dijkstra
 
 class AlgorithmTypeEnum:
     DIJKSTRA = 'DIJKSTRA'
-    FLOYD = 'FLOYD'
+    FLOYD    = 'FLOYD'
 
 class AmbulancePositionSystemValidationError(Exception):
     pass
@@ -54,11 +54,11 @@ class AmbulancePositionSystem(object):
 
     def __str__(self):
         
-        strgraph = str(self.graph)
-        strdist = '\nShortest Distances One:\n'
+        strgraph  = str(self.graph)
+        strdist   = '\nShortest Distances One:\n'
         strroutes = '\nShortest Routes One:\n'
-        strpath = '\nShortest way (more readable) for ambulance one:\n'
-        strcost = '\nShortest cost (more readable) for ambulance one:\n'
+        strpath   = '\nShortest way (more readable) for ambulance one:\n'
+        strcost   = '\nShortest cost (more readable) for ambulance one:\n'
 
         if (self.algorithm_type == AlgorithmTypeEnum.DIJKSTRA):
 
