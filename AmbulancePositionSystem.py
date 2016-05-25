@@ -66,11 +66,11 @@ class AmbulancePositionSystem(object):
 
                 for d in self.distances[local]:
                     strdist += "\t(Node:{:4}, Cost:{:4})\n".format(d, self.distances[local][d])
-                strdist += '\n\nShortest Distances Two: \n\n'
+                strdist += '\n\nShortest Distances for localization {} of {} to emergency at {}: \n\n'.format(local, self.name, self.emergency)
 
                 for r in self.routes[local]:
                     strroutes += "\t(Node:{:4}, Next Node:{:4})\n".format(r, self.routes[local][r])
-                strroutes += '\n\nShortest Routes Two: \n\n'
+                strdist += '\n\nShortest Distances for localization {} of {} to emergency at {}: \n\n'.format(local, self.name, self.emergency)
 
         elif (self.algorithm_type == AlgorithmTypeEnum.FLOYD):
 
