@@ -144,7 +144,7 @@ class AmbulancePositionSystem(object):
         # 1) this line is to pick get the adjacencies of a node in the graph
 
         # 2) when we have the adjacencies then we pick the next node AND this next node
-        # must be in the adjacencies otherwise there will be some kind of error
+        #    must be in the adjacencies otherwise there will be some kind of error
 
         # 3) dijkstra find the path with less cost then other paths
 
