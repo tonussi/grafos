@@ -1,5 +1,5 @@
 from Chronometer import timeit
-from PriorityDict import PriorityDict
+from PriorityQueue import PriorityQueue
 
 from heapq import heappop, heappush
 
@@ -21,7 +21,7 @@ class Dijkstra:
 
         D = {} # dictionary of final distances
         P = {} # dictionary of predecessors
-        Q = PriorityDict() # estimated distances of non-final vertices
+        Q = PriorityQueue() # estimated distances of non-final vertices
         Q[start] = 0 # add zero cost
 
         for v in Q:
