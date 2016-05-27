@@ -185,7 +185,7 @@ v4 and v5 dont have connection in between')
                      [ 6 , 4 , 87 ],
                      [ 6 , 5 , 76 ],
                      [ 2,  4 , 0  ]]
-        newGraph = Graph.newGraphFromEdgesMap(edges_map)
+        newGraph = Graph.newGraphFromEdgesMap(edges_map, len(edges_map))
 
         # this test the graph constrution from a mapping of edges with its costs
         for index in range(len(edges_map) - 1):
@@ -194,7 +194,7 @@ v4 and v5 dont have connection in between')
                             'test graph\'s consistence in costs and coesion in connections')
 
     def testGetRandomVertexId(self):
-        self.assertTrue(self.graph.getRandomVertexId().vertexid in self.graph.graph,
+        self.assertTrue(self.graph.getRandomVertexId() in self.graph.graph,
                         'retrieve random vertex must be inside the graph')
 
 if __name__ == "__main__":
