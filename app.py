@@ -146,6 +146,8 @@ def main(argv):
                         raise Exception("it was impossible to create the given directory name\n")
                 for ambulances in list_of_ambulances:
                     FileReader.writef('results_floyd' + os.path.sep + 'results_floyd_{}.txt'.format(ambulances.name), ambulances.__str__())
+            else:
+                raise Exception("such directory called {} doesnt exist!".format(args[0]))
         elif opt in ("-d", "--edsger-dijkstra"):
             if os.path.exists(args[0]):
                 number_of_files, data_files_list = FileReader.readFiles(args[0])
@@ -158,6 +160,8 @@ def main(argv):
                         raise Exception("it was impossible to create the given directory name\n")
                 for ambulances in list_of_ambulances:
                     FileReader.writef('results_dijkstra' + os.path.sep + 'results_dijkstra_{}.txt'.format(ambulances.name), ambulances.__str__())
+            else:
+                raise Exception("such directory called {} doesnt exist!".format(args[0]))
         elif opt in ("-e", "--export"):
             if not os.path.exists('dat'):
                 try:
