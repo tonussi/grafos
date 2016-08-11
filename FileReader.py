@@ -1,5 +1,4 @@
 import os, sys
-from blinker._utilities import text
 
 class FileReader(object):
 
