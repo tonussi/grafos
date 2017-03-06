@@ -269,6 +269,6 @@ class Graph(object):
 
         for adjacency in self.vertexAdjacencies(sucessor):
             if adjacency is not predecessor:
-                if self._removeCiclo(adjacency, sucessor, visited):
+                if self.__removeCycle(adjacency, sucessor, visited):
                     return True
         return False
